@@ -27,6 +27,8 @@ import AdminDashboardPage from './pages/AdminDashboardPage';
 import Overview from './components/admin/Overview';
 import AllWorks from './components/admin/AllWorks';
 import AllUsers from './components/admin/AllUsers';
+import AnalyticsPage from './pages/AnalyticsPage';
+import SettingsPage from './pages/SettingsPage';
 
 function App() {
   const [currentUser, setCurrentUser] = useState(null);
@@ -78,6 +80,8 @@ function App() {
         </Route>
 
         <Route path={`/profile`} element={<ProfilePage currentUser={currentUser} onLogout={handleAuthClick}/>} />
+        <Route path={`/settings`} element={<SettingsPage />} />
+        <Route path={`/analytics`} element={<AnalyticsPage />} />
         <Route path={`/signin`} element={<SignInPage onLogin={handleAuthClick} />} />
         <Route path={`/signup`} element={<SignUpPage onLogin={handleAuthClick} />} />
         <Route path={`/subscribe`} element={<SubscriptionPage currentUser={currentUser} setCurrentUser={setCurrentUser}/>}/>

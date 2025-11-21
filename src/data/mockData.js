@@ -86,3 +86,37 @@ export const allBooksData = [
     ]},
 
 ]
+
+// Analytics data for admin dashboard
+export const analyticsData = {
+  totalBooks: 5,
+  totalViews: 303,
+  totalUsers: 1250,
+  premiumUsers: 345,
+  premiumBooksCount: 1,
+  newUsersByDay: [
+    { day: "Mon", users: 15 },
+    { day: "Tue", users: 23 },
+    { day: "Wed", users: 18 },
+    { day: "Thu", users: 31 },
+    { day: "Fri", users: 22 },
+    { day: "Sat", users: 28 },
+    { day: "Sun", users: 19 },
+  ],
+  subscriptionBreakdown: [
+    { type: "Premium", count: 345 },
+    { type: "Basic", count: 705 },
+    { type: "Free", count: 200 },
+  ],
+  userRoles: [
+    { role: "Reader", count: 980 },
+    { role: "Author", count: 245 },
+    { role: "Admin", count: 25 },
+  ],
+};
+
+// Top authors data
+export const topAuthorsData = [
+  { id: 1, name: "Jane Doe", totalBooks: 3, totalViews: 303, followers: 450 },
+  { id: 2, name: "John Smith", totalBooks: 1, totalViews: 0, followers: 320 },
+];
