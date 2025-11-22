@@ -1,37 +1,77 @@
-import React from 'react'
-import { useParams } from 'react-router-dom';
+import React, { useState, useEffect } from 'react'
+import { useParams, Link } from 'react-router-dom';
 import BookDetail from '../components/bookDetail/BookDetail';
-import { Link } from 'react-router-dom';
-
-//import mock data
-import { allBooksData } from '../data/mockData';
 import BookChapters from '../components/bookDetail/BookChapters';
+import { bookApi } from '../services/api';
+import { useAuth } from '../services/auth/authContext';
+import { handleApiError } from '../services/utils/errorHandler';
 
-const BookDetailPage = ({signedIn,currentUser}) => {
- 
-
-  //get book id
+const BookDetailPage = () => {
   const { id } = useParams();
+  const { user, isAuthenticated } = useAuth();
+  const [book, setBook] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  //find the book
-  const book = allBooksData.find(b => b.id === Number(id));
+  useEffect(() => {
+    const fetchBook = async () => {
+      try {
+        setLoading(true);
+        const response = await bookApi.getBookById(id);
+        setBook(response.data);
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to load book');
+        handleApiError(err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  //if no book
-  if (!book) {
+    fetchBook();
+  }, [id]);
+
+  if (loading) {
     return (
-      <div className="bg-[#1e593e] min-h-svh p-8 text-white text-center text-2xl">
-        Book not found.
+      <div className="bg-[#1A5632] min-h-screen flex items-center justify-center">
+        <div className="text-white text-2xl">Loading...</div>
       </div>
-    )
+    );
   }
 
-  //if user is not subbed and book is premium
-  const isPremium = book.premiumStatus === 'premium';
-  
-  // User Permission Check
-  const canSeePremium = currentUser?.role === 'admin' || currentUser?.isSubscribed;
+  if (error || !book) {
+    return (
+      <div className="bg-[#1e593e] min-h-svh p-8 text-white text-center text-2xl">
+        {error || 'Book not found.'}
+      </div>
+    );
+  }
 
-  // Check 4: Block access if the book is premium AND the user can't see it
+  // Check age restriction
+  if (book.ageRestriction && user) {
+    const userAge = user.age || 0;
+    if (userAge < book.ageRestriction) {
+      return (
+        <div className="bg-[#CEF17B] min-h-screen p-8 text-center">
+          <h1 className="text-3xl font-bold mb-4">Age Restriction</h1>
+          <p className="text-xl mb-6">
+            This book has an age restriction of {book.ageRestriction}+ years.
+            Your current age ({userAge}) does not meet the requirement.
+          </p>
+          <Link
+            to="/browse"
+            className="bg-[#FFD7DF] text-[#1A5632] font-bold py-3 px-6 rounded-lg hover:bg-[#1A5632] hover:text-[#FFD7DF] transition-all duration-300"
+          >
+            Browse Other Books
+          </Link>
+        </div>
+      );
+    }
+  }
+
+  // Check premium access
+  const isPremium = book.premiumStatus === 'premium';
+  const canSeePremium = user?.role === 'admin' || user?.subscriptionStatus === 'active';
+
   if (isPremium && !canSeePremium) {
     return (
       <div className="bg-[#CEF17B] min-h-screen p-8 text-center">
@@ -51,12 +91,11 @@ const BookDetailPage = ({signedIn,currentUser}) => {
 
   return (
     <div className='bg-[#1A5632] flex flex-col gap-[50px] py-[100px] items-center'>
-
         {/* Book Detail */}
-        <BookDetail book={book} signedIn={signedIn} currentUser={currentUser}/>
+        <BookDetail book={book} signedIn={isAuthenticated} currentUser={user}/>
 
         {/* Book Chapters */}
-        <BookChapters chapterList={book.chapterList} bookId={book.id}/>
+        <BookChapters chapterList={book.chapters || []} bookId={book.id}/>
     </div>
   )
 }

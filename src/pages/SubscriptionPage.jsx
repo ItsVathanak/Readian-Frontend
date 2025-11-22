@@ -1,105 +1,112 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import SubscriptionCard from '../components/subscription/SubscriptionCard'; // We'll create this
+import SubscriptionCard from '../components/subscription/SubscriptionCard';
+import { useAuth } from '../services/auth/authContext';
+import { subscriptionApi } from '../services/api';
+import { handleApiError, showSuccessToast } from '../services/utils/errorHandler';
 
-// 1. Define your plan data in one place
-const plans = [
-  {
-    name: 'Basic',
-    price: 'Free',
-    features: [
-      'Public books only',
-      'No downloads',
-      'Read only',
-      'Basic search',
-      'Basic ads'
-    ],
-    isDefault: true,
-    styles: {
-      bg: 'bg-lime-200',
-      button: 'bg-gray-300 cursor-default'
-    }
-  },
-  {
-    name: 'Silver',
-    price: '5.99$',
-    features: [
-      'Full access to all books',
-      '20 downloads a month',
-      'Advanced search',
-      'Partial ads'
-    ],
-    isDefault: false,
-    styles: {
-      bg: 'bg-gray-200',
-      button: 'bg-black text-white border-2 border-black hover:bg-white hover:text-black transition-all duration-300'
-    }
-  },
-  {
-    name: 'Gold',
-    price: '12.99$',
-    features: [
-      'Early access to all books',
-      'Unlimited downloads',
-      'Advanced search',
-      'No ads'
-    ],
-    isDefault: false,
-    styles: {
-      bg: 'bg-yellow-400',
-      button: 'bg-black text-white border-2 border-black hover:bg-white hover:text-black transition-all duration-300'
-    }
-  }
-];
-
-function SubscriptionPage({currentUser, setCurrentUser}) {
+function SubscriptionPage() {
   const navigate = useNavigate();
+  const { user, updateUser } = useAuth();
+  const [plans, setPlans] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [subscription, setSubscription] = useState(null);
 
-  //Find user's current plan
-  const currentPlan = plans.find(
-    plan => plan.name === currentUser?.subscriptionTier
-  );
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        // Fetch available plans
+        const plansResponse = await subscriptionApi.getPlans();
+        setPlans(plansResponse.data.plans || []);
+
+        // If user is logged in, fetch their subscription
+        if (user) {
+          try {
+            const subResponse = await subscriptionApi.getMySubscription();
+            setSubscription(subResponse.data);
+          } catch (_err) {
+            // User might not have a subscription
+            console.log('No active subscription');
+          }
+        }
+      } catch (error) {
+        handleApiError(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [user]);
 
   // Unsubscribe handler
-  const handleUnsubscribe = () => {
+  const handleUnsubscribe = async () => {
     if (window.confirm("Are you sure you want to unsubscribe?")) {
-      const updatedUser = {
-        ...currentUser,
-        isSubscribed: false,
-        subscriptionTier: 'Basic'
-      };
-      setCurrentUser(updatedUser);
+      try {
+        await subscriptionApi.cancelSubscription();
+        setSubscription(null);
+        updateUser({ subscriptionStatus: 'inactive' });
+        showSuccessToast('Subscription cancelled successfully');
+      } catch (error) {
+        handleApiError(error);
+      }
     }
-  }
+  };
 
   // This function will be passed to the cards
   const handleSubscribeClick = (plan) => {
+    if (!user) {
+      navigate('/signin', { state: { from: '/subscribe' } });
+      return;
+    }
+
     // Navigate to the payment page, passing plan data in 'state'
     navigate('/confirm-payment', { 
       state: { 
-        planName: plan.name, 
+        planId: plan.id,
+        planName: plan.name,
         price: plan.price 
       } 
     });
   };
 
-  if (currentUser && currentUser.isSubscribed && currentPlan) {
-    
+  if (loading) {
+    return (
+      <div className="bg-[#FFFDEE] min-h-screen flex items-center justify-center">
+        <div className="text-2xl">Loading plans...</div>
+      </div>
+    );
+  }
+
+  if (user?.subscriptionStatus === 'active' && subscription) {
+    const currentPlan = plans.find(p => p.id === subscription.planId);
+
     // --- RENDER THE "SUBSCRIBED" VIEW ---
     return (
       <div className="bg-[#FFFDEE] min-h-screen p-8 flex flex-col items-center">
         <h1 className="text-4xl font-bold mb-12">
-          Your current subscription: {currentPlan.name}
+          Your current subscription: {currentPlan?.name || 'Premium'}
         </h1>
         
         {/* Display their current plan benefits */}
         <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
           <h2 className="text-2xl font-bold mb-4">Your Benefits:</h2>
-          <ul className="list-disc list-inside space-y-2">
-            {currentPlan.features.map((feature, index) => (
-              <li key={index} className="text-gray-700">{feature}</li>
-            ))}
-          </ul>
+          {currentPlan?.features && (
+            <ul className="list-disc list-inside space-y-2">
+              {currentPlan.features.map((feature, index) => (
+                <li key={index} className="text-gray-700">{feature}</li>
+              ))}
+            </ul>
+          )}
+
+          {subscription.endDate && (
+            <div className="mt-6 pt-4 border-t">
+              <p className="text-sm text-gray-600">
+                Expires: {new Date(subscription.endDate).toLocaleDateString()}
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Unsubscribe Button */}
@@ -107,7 +114,7 @@ function SubscriptionPage({currentUser, setCurrentUser}) {
           onClick={handleUnsubscribe}
           className="mt-8 bg-red-500 text-white py-3 px-8 rounded-full font-semibold hover:bg-red-600"
         >
-          Unsubscribe
+          Cancel Subscription
         </button>
       </div>
     );

@@ -1,8 +1,15 @@
 import React from 'react'
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../services/auth/authContext';
 
-const Navbar = ({signedIn, onAuthClick, currentUser}) => {
+const Navbar = () => {
+  const { user, isAuthenticated, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/signin');
+  };
   return (
     <header className='bg-[#C0FFB3] h-auto w-full flex '>
         {/* Logo */}
@@ -17,24 +24,23 @@ const Navbar = ({signedIn, onAuthClick, currentUser}) => {
         </div>
 
         {/* navlinks */}
-        {currentUser ? (
+        {isAuthenticated && user ? (
           <div className='flex justify-center items-center gap-[30px] p-[20px]'>
             <Link to="/">Home</Link>
 
             {/* role based link */}
-            {currentUser.role === 'author' && (
+            {user.role === 'author' && (
               <Link to="/authordash">Author Dashboard</Link>
             )}
-            {currentUser.role === 'admin' && (
+            {user.role === 'admin' && (
               <Link to="/admindash">Admin Dashboard</Link>
             )}
 
-            
             <Link to="/browse">Browse</Link>
             <Link to="/instruction">Help</Link>
             <Link to="/subscribe">Subscribe</Link>
             <Link to="/profile">Profile</Link>
-            <button onClick={onAuthClick}>Log Out</button>
+            <button onClick={handleLogout}>Log Out</button>
           </div>
           
         ) : (
@@ -43,7 +49,7 @@ const Navbar = ({signedIn, onAuthClick, currentUser}) => {
             <Link to="/browse">Browse</Link>
             <Link to="/instruction">Help</Link>
             <Link to="/signup">Sign Up</Link>
-            <button onClick={onAuthClick}>Log In</button>
+            <Link to="/signin">Log In</Link>
           </div>
           
         )}

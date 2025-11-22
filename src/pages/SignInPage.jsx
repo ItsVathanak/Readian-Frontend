@@ -1,22 +1,44 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../services/auth/authContext';
+import { handleApiError, showSuccessToast } from '../services/utils/errorHandler';
 
-// 1. Receive 'onLogin' prop from App.jsx
-function SignInPage({ onLogin }) {
-  const [username, setUsername] = useState('');
+function SignInPage() {
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const { login, isAuthenticated } = useAuth();
 
-  const handleSubmit = (e) => {
+  // Show message if redirected from registration
+  useEffect(() => {
+    if (location.state?.message) {
+      showSuccessToast(location.state.message);
+    }
+  }, [location]);
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/browse');
+    }
+  }, [isAuthenticated, navigate]);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // In a real app, you'd send this to your backend
-    console.log("Logging in with:", { username, password });
-    
-    // 2. Call the login function from App.jsx
-    onLogin(); 
-    
-    // 3. Send the user to their dashboard or profile
-    navigate('/profile'); 
+
+    try {
+      setLoading(true);
+      await login({ email, password });
+
+      // Navigate based on user role
+      navigate('/browse');
+    } catch (error) {
+      handleApiError(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -31,13 +53,13 @@ function SignInPage({ onLogin }) {
         <h1 className="geist text-4xl font-bold text-center mb-8">Sign In</h1>
         
         <div className="space-y-6">
-          {/* Username */}
+          {/* Email */}
           <div>
-            <label className="block mb-1 font-semibold">Username</label>
-            <input 
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+            <label className="block mb-1 font-semibold">Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full p-3 border rounded-lg bg-white"
               required
             />
@@ -53,15 +75,21 @@ function SignInPage({ onLogin }) {
               className="w-full p-3 border rounded-lg bg-white"
               required
             />
+            <div className="text-right mt-1">
+              <Link to="/forgot-password" className="text-sm text-blue-600 hover:underline">
+                Forgot password?
+              </Link>
+            </div>
           </div>
         </div>
 
         {/* Sign In Button */}
         <button 
           type="submit"
-          className="w-full bg-[#1A5632] text-[#FFD7DF] border-2 border-[#1A5632] py-3 rounded-lg font-bold mt-8 hover:bg-[#FFD7DF] hover:text-[#1A5632] transition-all duration-300"
+          disabled={loading}
+          className="w-full bg-[#1A5632] text-[#FFD7DF] border-2 border-[#1A5632] py-3 rounded-lg font-bold mt-8 hover:bg-[#FFD7DF] hover:text-[#1A5632] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Sign In
+          {loading ? 'Signing In...' : 'Sign In'}
         </button>
 
         {/* Link to Sign Up */}
