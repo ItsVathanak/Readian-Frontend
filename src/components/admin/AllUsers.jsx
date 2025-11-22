@@ -1,41 +1,43 @@
-import React, { useState, useMemo } from 'react';
-import { allUsersData } from '../../data/mockUser';
-import { allBooksData } from '../../data/mockData';
-
-// Import your new popup components
+import React, { useState, useEffect, useMemo } from 'react';
 import RemoveUserPopup from './RemoveUserPopup';
 import UserRemovalCompletePopup from './UserRemovalCompletePopup';
+import { adminApi } from '../../services/api';
+import { handleApiError, showSuccessToast } from '../../services/utils/errorHandler';
 
 function AllUsers() {
-  // --- Filter State ---
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [usernameFilter, setUsernameFilter] = useState('');
   const [idFilter, setIdFilter] = useState('');
-
-  // --- Popup State ---
   const [userToRemove, setUserToRemove] = useState(null);
   const [reason, setReason] = useState('');
   const [showComplete, setShowComplete] = useState(false);
 
-  // 1. Process and filter the user data
-  const displayUsers = useMemo(() => {
-    // First, map users to include their work count
-    const usersWithWorkCount = allUsersData.map(user => {
-      // Find all books where the authorId matches this user's id
-      const workCount = allBooksData.filter(
-        book => book.authorId === user.id
-      ).length;
-      return { ...user, workCount }; // Return a new object
-    });
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
-    // Now, apply the filters
-    return usersWithWorkCount
+  const fetchUsers = async () => {
+    try {
+      setLoading(true);
+      const response = await adminApi.getAllUsers();
+      setUsers(response.data.users || []);
+    } catch (error) {
+      handleApiError(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const displayUsers = useMemo(() => {
+    return users
       .filter(user =>
-        (user.username || "").toLowerCase().includes(usernameFilter.toLowerCase())
+        (user.name || "").toLowerCase().includes(usernameFilter.toLowerCase())
       )
       .filter(user =>
-        (user.id || "").toLowerCase().includes(idFilter.toLowerCase())
+        (user.id || "").toString().toLowerCase().includes(idFilter.toLowerCase())
       );
-  }, [usernameFilter, idFilter]);
+  }, [users, usernameFilter, idFilter]);
 
   // --- Handler Functions ---
   const handleRemoveClick = (user) => {
@@ -47,21 +49,35 @@ function AllUsers() {
     setReason('');
   };
 
-  const handleConfirmRemove = () => {
+  const handleConfirmRemove = async () => {
     if (!reason) {
       alert("Please provide a reason for removal.");
       return;
     }
-    console.log(`Removing user: ${userToRemove.username} for reason: ${reason}`);
-    setShowComplete(true);
+
+    try {
+      await adminApi.deleteUser(userToRemove.id, { reason });
+      showSuccessToast('User removed successfully');
+      setShowComplete(true);
+      await fetchUsers(); // Refresh the user list
+    } catch (error) {
+      handleApiError(error);
+    }
   };
 
   const handleFinalConfirm = () => {
     setShowComplete(false);
     setUserToRemove(null);
     setReason('');
-    // In a real app, re-fetch data here
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-2xl">Loading users...</div>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -102,18 +118,20 @@ function AllUsers() {
           <tbody>
             {displayUsers.map((user) => (
               <tr key={user.id} className="border-b border-gray-200 hover:bg-gray-50">
-                <td className="p-2">{user.id}</td>
-                <td className="p-2">{user.username}</td>
+                <td className="p-2">{user.id?.toString().slice(0, 8)}...</td>
+                <td className="p-2">{user.name}</td>
                 <td className="p-2">{user.email}</td>
-                <td className="p-2">{user.joinedDate}</td>
                 <td className="p-2">
-                  {user.isSubscribed ? (
-                    <span className="font-semibold text-green-600">{user.subscriptionTier || 'Subscribed'}</span>
+                  {new Date(user.createdAt).toLocaleDateString()}
+                </td>
+                <td className="p-2">
+                  {user.subscriptionStatus === 'active' ? (
+                    <span className="font-semibold text-green-600 capitalize">Active</span>
                   ) : (
-                    <span className="text-gray-500">Not Subscribed</span>
+                    <span className="text-gray-500">Inactive</span>
                   )}
                 </td>
-                <td className="p-2">{user.workCount}</td>
+                <td className="p-2">{user.booksCount || 0}</td>
                 <td className="p-2 text-center">
                   <button 
                     onClick={() => handleRemoveClick(user)}

@@ -1,27 +1,17 @@
 import React from 'react';
-import { Outlet, Navigate } from 'react-router-dom';
-import AdminSidebar from '../components/admin/AdminSidebar'; // The new sidebar
+import { Outlet } from 'react-router-dom';
+import AdminSidebar from '../components/admin/AdminSidebar';
+import { useAuth } from '../services/auth/authContext';
 
-function AdminDashboardPage({ currentUser }) {
-  
-  // --- Route Protection ---
-  if (!currentUser) {
-    // Not logged in, send to sign in
-    return <Navigate to="/signin" replace />;
-  }
-  if (currentUser.role !== 'admin') {
-    // Logged in, but NOT an admin. Send to their own dashboard.
-    return <Navigate to="/authordash" replace />;
-  }
-  // -------------------------
+function AdminDashboardPage() {
+  const { user } = useAuth();
 
   return (
     <div className="flex justify-between" >
-      
-      <AdminSidebar currentUser={currentUser} />
+      <AdminSidebar currentUser={user} />
 
       <main className="p-6 w-full flex-1">
-        <Outlet context={{ user: currentUser }} /> 
+        <Outlet context={{ user }} />
       </main>
 
     </div>

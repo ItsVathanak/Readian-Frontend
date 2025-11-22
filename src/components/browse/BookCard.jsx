@@ -9,33 +9,37 @@ function truncate(str, n) {
 
 const BookCard = ({book, linkTo}) => {
 
-// destructure the book
+// destructure the book and map backend fields to component fields
     const {
-        id,
+        _id,
         title,
         author,
-        publishDate,
-        cover,
+        publishedDate,
+        image,
         tags,
-        status,
-        pubStatus,
+        bookStatus,
         description,
-        chapters,
-        views,
+        totalChapters,
+        viewCount,
         likes
     } = book;
 
-    // defnie linkTo
-    const destination = linkTo || `/book/${id}`;
+    // defnie linkTo - use _id from backend
+    const destination = linkTo || `/book/${_id}`;
+
+    // Handle tags - can be string or array
+    const tagsDisplay = Array.isArray(tags)
+        ? tags.join(", ")
+        : (tags || "No tags provided");
 
   return (
     <Link 
         to={destination}
         className='flex rounded-[10px] border-solid border-2 w-full max-w-[650px] h-[250px] bg-white overflow-hidden hover:scale-110 transition-all duration-300'
     >
-        {book.cover ? (
+        {image ? (
             <div className='bg-[#CEF17B] w-4/12 h-full rounded-l-[10px]'>
-                <img src={book.cover} alt={book.title || "Book Cover"} className='w-full h-full object-cover ' />
+                <img src={image} alt={title || "Book Cover"} className='w-full h-full object-cover ' />
             </div>
         ) : (
             <div className='bg-[#CEF17B] w-4/12 h-full rounded-l-[10px] flex items-center justify-center'>
@@ -55,9 +59,9 @@ const BookCard = ({book, linkTo}) => {
                         {truncate(title,10) || "Title unavailable"}
                     </h1>
                     <p className='text-[12px]'>
-                        By {author || "Author unavailable"}
+                        By {typeof author === 'string' ? author : (author?.name || "Author unavailable")}
                     </p>
-                    {pubStatus === "draft" ? (
+                    {book.status === "draft" ? (
                         <p className='text-[16px] text-red-500 font-bold'>
                             (Draft)
                         </p>
@@ -65,22 +69,22 @@ const BookCard = ({book, linkTo}) => {
                         <></>
                     )}
                 </div>
-                <p>
-                    {publishDate || "Publish date unavailable"}
+                <p className='text-[10px]'>
+                    {publishedDate ? new Date(publishedDate).toLocaleDateString() : "Date unavailable"}
                 </p>
             </div>
 
             {/* Tags */}
             <div>
                 <p className='text-[16px] font-semibold'>
-                    Tags: {truncate(tags.join(", "), 100) || "No tags provided"}
+                    Tags: {truncate(tagsDisplay, 100)}
                 </p>
             </div>
 
             {/* Middle section */}
             <div>
                 <p className='font-bold text-[16px]'>
-                    {status}
+                    {bookStatus || "Status unavailable"}
                 </p>
                 <p 
                 className='text-[12px] w-full wrap-break-word line-clamp-2'
@@ -90,16 +94,16 @@ const BookCard = ({book, linkTo}) => {
                 </p>
             </div>
 
-            {/* Bottmo section */}
+            {/* Bottom section */}
             <div className='flex gap-[10px]'>
                 <p className='text-[10px]'>
-                    Chapters: {chapters || "None" }
+                    Chapters: {totalChapters || 0}
                 </p>
                 <p className='text-[10px]'>
-                    Views: {views || "None" }
+                    Views: {viewCount || 0}
                 </p>
                 <p className='text-[10px]'>
-                    Likes: {likes || "None" }
+                    Likes: {likes || 0}
                 </p>
             </div>
         </div>

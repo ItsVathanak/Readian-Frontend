@@ -4,6 +4,11 @@ import './index.css'
 import App from './App.jsx'
 import { BrowserRouter } from 'react-router-dom';
 import ScrollToTop from './components/layout/ScrollToTop.jsx';
+import { validateEnvironment, printConfig } from './services/utils/envValidation.js';
+
+// Validate environment configuration on startup
+validateEnvironment();
+printConfig();
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

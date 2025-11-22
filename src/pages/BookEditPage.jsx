@@ -1,167 +1,178 @@
-import React, { useMemo } from 'react'
+import React from 'react'
 import { useParams, Navigate, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 
-
 import BookEditSidebar from '../components/bookEdit/BookEditSidebar';
-import { allBooksData } from '../data/mockData';
 import BookEditForm from '../components/bookEdit/BookEditForm';
 import BookEditChapters from '../components/bookEdit/BookEditChapters';
+import { useAuth } from '../services/auth/authContext';
+import { bookApi } from '../services/api';
+import { handleApiError, showSuccessToast } from '../services/utils/errorHandler';
 
-
-const BookEditPage = ({currentUser}) => {
-
-    const { bookId } = useParams(); 
-
-    //check if making a new book
+const BookEditPage = () => {
+    const { bookId } = useParams();
+    const { user } = useAuth();
+    const navigate = useNavigate();
     const isNew = bookId === 'new';
 
-    const bookToEdit = useMemo(() => {
-        return isNew ? null : allBooksData.find(b => b.id === Number(bookId));
-    }, [bookId, isNew]); 
+    const [bookToEdit, setBookToEdit] = useState(null);
+    const [loading, setLoading] = useState(true);
 
-    const navigate = useNavigate();
-    
-    // We initialize state with the book's data
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
-    const [status, setStatus] = useState('Ongoing'); // Your "status" (Ongoing/Completed)
+    const [status, setStatus] = useState('ongoing');
     const [tags, setTags] = useState([]);
-    const [tagInput, setTagInput] = useState('');
+    const [genre, setGenre] = useState([]);
     const [premiumStatus, setPremiumStatus] = useState('free');
+    const [ageRestriction, setAgeRestriction] = useState(null);
     const [chapters, setChapters] = useState([]);
 
-    // Load book data into state *after* it's found
-    // This prevents issues if bookToEdit is slow to load
+    // Load book data from API
     useEffect(() => {
+        const fetchBook = async () => {
+            if (isNew) {
+                setTitle('Untitled Book');
+                setDescription('');
+                setStatus('ongoing');
+                setTags([]);
+                setGenre([]);
+                setPremiumStatus('free');
+                setAgeRestriction(null);
+                setChapters([]);
+                setLoading(false);
+            } else {
+                try {
+                    setLoading(true);
+                    const response = await bookApi.getBookById(bookId);
+                    const book = response.data;
 
-        if (isNew) {
-            setTitle('Untitled Book');
-            setDescription('');
-            setStatus('Ongoing');
-            setTags([]);
-            setPremiumStatus('free');
-            setChapters([]);
-        } else if (bookToEdit) {
-            setTitle(bookToEdit.title || '');
-            setDescription(bookToEdit.description || '');
-            setStatus(bookToEdit.status || 'Ongoing');
-            setTags(bookToEdit.tags || []);
-            setPremiumStatus(bookToEdit.premiumStatus || 'free')
-            setChapters(bookToEdit.chapterList || []);
-        }
-    }, [bookToEdit, isNew]); // Re-run this if bookToEdit changes
+                    setBookToEdit(book);
+                    setTitle(book.title || '');
+                    setDescription(book.description || '');
+                    setStatus(book.status || 'ongoing');
+                    setTags(book.tags || []);
+                    setGenre(book.genre || []);
+                    setPremiumStatus(book.premiumStatus || 'free');
+                    setAgeRestriction(book.ageRestriction || null);
+                    setChapters(book.chapters || []);
+                } catch (error) {
+                    handleApiError(error);
+                } finally {
+                    setLoading(false);
+                }
+            }
+        };
 
-    // 5. Route Protection
-    if (!currentUser) {
-        return <Navigate to="/" replace />; // Not logged in
+        fetchBook();
+    }, [bookId, isNew]);
+
+    const dashboardPath = user?.role === "admin" ? "/admindash" : "/authordash/works";
+
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="text-2xl">Loading book...</div>
+            </div>
+        );
     }
+
     if (!isNew && !bookToEdit) {
-        return <div className="p-8">Book not found.</div>; // Book doesn't exist
+        return <div className="p-8">Book not found.</div>;
     }
-    // This is the most important part!
-    if (!isNew && bookToEdit.authorId !== currentUser.id) {
-        return <Navigate to="/authordash" replace />; // Not your book!
+
+    if (!isNew && bookToEdit?.author?.id !== user?.id && user?.role !== 'admin') {
+        return <Navigate to="/authordash" replace />;
     }
-    // Determine correct dashboard path
-    const dashboardPath = currentUser.role === "admin" ? "/admindash" : "/authordash/works";
 
     // --- Form Handlers ---
-    const saveBookData = () => {
-        if (isNew) {
-            const newBook = {
-                id: Date.now(), // Mock ID
-                authorId: currentUser.id,
-                author: currentUser.displayName,
-                pubStatus: 'draft', // New books are drafts
-                title, description, status, tags, premiumStatus, chapters,
+    const saveBookData = async () => {
+        try {
+            const bookData = {
+                title,
+                description,
+                status,
+                tags,
+                genre,
+                premiumStatus,
+                ageRestriction: ageRestriction || undefined,
             };
-            console.log("CREATING new book:", newBook);
-            alert("New draft created! (Check console)");
-            // After creating, navigate to the new edit page
-            navigate(`/edit/${newBook.id}`, { replace: true });
-        } else {
-            //API call will go here
-            //for now log console
-            console.log("Saving book data:", { id: bookToEdit.id, title, description });
-            alert("Book Saved!"); 
-        }
-        
-    }
 
-    const handleSaveSubmit = (e) => {
-        e.preventDefault();
-        // In a real app, you'd send this data to your API
-        saveBookData();
+            if (isNew) {
+                const response = await bookApi.createBook(bookData);
+                showSuccessToast('Book created successfully!');
+                navigate(`/edit/${response.data.id}`, { replace: true });
+            } else {
+                await bookApi.updateBook(bookToEdit.id, bookData);
+                showSuccessToast('Book updated successfully!');
+            }
+        } catch (error) {
+            handleApiError(error);
+        }
     };
 
-    const handleEditChapterClick = (chapterId) => {
-        saveBookData();
+    const handleSaveSubmit = async (e) => {
+        e.preventDefault();
+        await saveBookData();
+    };
+
+    const handleEditChapterClick = async (chapterId) => {
+        await saveBookData();
         if (!isNew) {
             navigate(`/edit/${bookToEdit.id}/chapter/${chapterId}`);
         } else {
-            // This shouldn't happen on a new book, but good to handle
-            console.error("Cannot edit chapter of a book that hasn't been saved yet.");
-            alert("Save your new book first before adding chapters.");
+            showSuccessToast("Save your new book first before adding chapters.");
         }
-        
-    }
+    };
 
     const handleNewChapter = () => {
-        const newChapter = {
-            id: Date.now(), // A temporary mock ID
-            title: "New Chapter (Untitled)",
-            date: new Date().toLocaleDateString(),
-            content: ""
-            // In a real app, you'd save this to the DB and get a real ID
-        };
-
-        // Add the new chapter to the *local* state
-        setChapters(prevChapters => [...prevChapters, newChapter]);
+        if (isNew) {
+            showSuccessToast("Please save the book first before adding chapters.");
+            return;
+        }
+        navigate(`/edit/${bookToEdit.id}/chapter/new`);
     };
 
-    const handleDeleteWork = () => {
-        // We add a window.confirm to be safe
+    const handleDeleteWork = async () => {
         if (window.confirm("Are you sure you want to permanently delete this work?")) {
-            console.log("Deleting book:", bookToEdit.id);
-            // In a real app: api.deleteBook(bookToEdit.bookId)
-            alert("Work Deleted! (In theory)");
-        // Here you would navigate back to the dashboard
-        navigate(dashboardPath)
+            try {
+                await bookApi.deleteBook(bookToEdit.id);
+                showSuccessToast('Book deleted successfully!');
+                navigate(dashboardPath);
+            } catch (error) {
+                handleApiError(error);
+            }
         }
     };
 
-    const handlePublishWork = () => {
+    const handlePublishWork = async () => {
         if (!isNew) {
-            const newStatus = bookToEdit.pubStatus === 'draft' ? 'published' : 'draft';
-            // In a real app, you'd send this to your API
-            console.log(`Toggling status to: ${newStatus}`);
-            alert(`Status changed to ${newStatus}! (Check console)`);
-            // Note: To see this change live, you'd have to update your mock data
-            // in state, but for now, this logs the action.
-            navigate(dashboardPath)
+            try {
+                const newPubStatus = bookToEdit.pubStatus === 'draft' ? 'published' : 'draft';
+                await bookApi.updateBook(bookToEdit.id, { pubStatus: newPubStatus });
+                showSuccessToast(`Book ${newPubStatus === 'published' ? 'published' : 'unpublished'} successfully!`);
+                navigate(dashboardPath);
+            } catch (error) {
+                handleApiError(error);
+            }
         } else {
-            // a new book is "published" by saving it
-            saveBookData();
+            await saveBookData();
         }
-        
-    }
+    };
 
     return (
         <div className='flex'>
             {/* sidebar */}
             <BookEditSidebar 
                 stats={{
-                    views: isNew ? 0 : bookToEdit.views,
-                    likes: isNew ? 0 : bookToEdit.likes,
-                    premiumStatus: isNew ? 'free' : bookToEdit.premiumStatus,
-                    // 👇 This was the problem line. Use the same fix.
-                    pubStatus: isNew ? 'draft' : bookToEdit.pubStatus
+                    views: isNew ? 0 : (bookToEdit?.views || 0),
+                    likes: isNew ? 0 : (bookToEdit?.likesCount || 0),
+                    premiumStatus: premiumStatus,
+                    pubStatus: isNew ? 'draft' : (bookToEdit?.pubStatus || 'draft')
                 }}
                 onDelete={handleDeleteWork}
                 isNewBook={isNew}
                 onPublishWork={handlePublishWork}
-                dashboardPath = {dashboardPath}
+                dashboardPath={dashboardPath}
             />
 
             {/* display section */}
@@ -175,8 +186,12 @@ const BookEditPage = ({currentUser}) => {
                     setStatus={setStatus}
                     tags={tags}
                     setTags={setTags}
+                    genre={genre}
+                    setGenre={setGenre}
                     premiumStatus={premiumStatus}
                     setPremiumStatus={setPremiumStatus}
+                    ageRestriction={ageRestriction}
+                    setAgeRestriction={setAgeRestriction}
                     onSave={handleSaveSubmit}
                 />
 

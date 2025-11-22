@@ -1,14 +1,37 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { useOutletContext } from 'react-router-dom'
-import { allBooksData } from '../../data/mockData';
 import BookCard from '../browse/BookCard';
+import { userApi } from '../../services/api';
+import { handleApiError } from '../../services/utils/errorHandler';
 
 const MyLiked = () => {
-
     const { user } = useOutletContext();
+    const [likedBooks, setLikedBooks] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    //find full book objects that match user's liked ids
-    const likedBooks = allBooksData.filter(book => user.likedBooksIDs.includes(book.id))
+    useEffect(() => {
+      const fetchLikedBooks = async () => {
+        try {
+          setLoading(true);
+          const response = await userApi.getLikedBooks();
+          setLikedBooks(response.data.books || []);
+        } catch (error) {
+          handleApiError(error);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchLikedBooks();
+    }, []);
+
+    if (loading) {
+      return (
+        <div className='flex flex-col w-full items-center justify-center min-h-[400px]'>
+          <div className="text-2xl">Loading liked books...</div>
+        </div>
+      );
+    }
 
   return (
     <div className='flex flex-col items-center w-full'>

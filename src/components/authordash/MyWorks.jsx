@@ -1,14 +1,37 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import { allBooksData } from '../../data/mockData';
-import BookCard from '../browse/BookCard'; // Re-use your card component!
+import BookCard from '../browse/BookCard';
+import { userApi } from '../../services/api';
+import { handleApiError } from '../../services/utils/errorHandler';
 
 function MyWorks() {
-  // 1. Get the 'user' object from the Outlet's context
   const { user } = useOutletContext();
+  const [myWorks, setMyWorks] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // 2. Filter the books just like you did before
-  const myWorks = allBooksData.filter(book => book.authorId === user.id && book.pubStatus === "published");
+  useEffect(() => {
+    const fetchMyBooks = async () => {
+      try {
+        setLoading(true);
+        const response = await userApi.getMyBooks({ status: 'published' });
+        setMyWorks(response.data.books || []);
+      } catch (error) {
+        handleApiError(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMyBooks();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className='flex flex-col w-full items-center justify-center min-h-[400px]'>
+        <div className="text-2xl">Loading your works...</div>
+      </div>
+    );
+  }
 
   return (
     <div className='flex flex-col w-full'>
@@ -20,7 +43,7 @@ function MyWorks() {
         {myWorks.length > 0 ? (
           myWorks.map(book => <BookCard key={book.id} book={book} linkTo={`/edit/${book.id}`}/>)
         ) : (
-          <p>You haven't published any works yet.</p>
+          <p className="text-lg text-gray-600">You haven't published any works yet.</p>
         )}
       </div>
     </div>

@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
-import { useLocation, Navigate, Link, useNavigate } from 'react-router-dom';
+import { useLocation, Navigate, useNavigate } from 'react-router-dom';
 import PaymentSuccessPopup from '../components/PaymentConfirm/PaymentSuccessPopup';
+import { useAuth } from '../services/auth/authContext';
+import { subscriptionApi } from '../services/api';
+import { handleApiError, showSuccessToast } from '../services/utils/errorHandler';
 
-function ConfirmPaymentPage({currentUser, setCurrentUser}) {
+function ConfirmPaymentPage() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { user, updateUser } = useAuth();
 
   const [showSuccess, setShowSuccess] = useState(false);
-
-  const [firstName, setFirstName] = useState('');
-  const [email, setEmail] = useState(currentUser?.email || '')
-  const [cardNumber, setCardNumber] = useState('');
+  const [loading, setLoading] = useState(false);
 
   // Get the plan data from the location state
   const planData = location.state;
@@ -20,33 +21,37 @@ function ConfirmPaymentPage({currentUser, setCurrentUser}) {
   if (!planData) {
     return <Navigate to="/subscribe" replace />;
   }
-  //check if loggd in
-  if (!currentUser) {
-    alert("Please log in to subscribe.");
-    return <Navigate to="/" replace />;
+
+  if (!user) {
+    return <Navigate to="/signin" state={{ from: '/confirm-payment' }} replace />;
   }
 
-  const { planName, price } = planData;
+  const { planId, planName, price } = planData;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Simple validation
-    // if (!firstName || !email || !cardNumber) {
-    //   alert("Please fill in all required fields.");
-    //   return;
-    // }
+    try {
+      setLoading(true);
 
-    // Update the user's subscription status
-    const updatedUser = {
-      ...currentUser,
-      isSubscribed: true,
-      subscriptionTier: planName // You can add the tier
-    };
-    setCurrentUser(updatedUser); // This updates the state in App.jsx
+      // Mock payment data - in real app, this would come from payment gateway
+      const paymentData = {
+        paymentMethod: 'card',
+        // Add other payment details as needed
+      };
 
-    // 7. Show the success popup
-    setShowSuccess(true);
+      await subscriptionApi.subscribe(planId, paymentData);
+
+      // Update user subscription status
+      updateUser({ subscriptionStatus: 'active' });
+
+      showSuccessToast('Subscription successful!');
+      setShowSuccess(true);
+    } catch (error) {
+      handleApiError(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handlePopupConfirm = () => {
@@ -78,8 +83,8 @@ function ConfirmPaymentPage({currentUser, setCurrentUser}) {
           <input type="text" placeholder="Middle Name" className="p-2 border rounded col-span-1" />
           <input type="text" placeholder="Last Name" className="p-2 border rounded col-span-1" />
         </div>
-        <input type="email" placeholder="Email" className="p-2 border rounded w-full mb-4" required/>
-        
+        <input type="email" placeholder="Email" defaultValue={user?.email} className="p-2 border rounded w-full mb-4" required/>
+
         {/* Credit Card Details */}
         <h2 className="text-2xl font-semibold mb-4">Credit Card Details</h2>
         <input type="text" placeholder="Card Number" className="p-2 border rounded w-full mb-4" />

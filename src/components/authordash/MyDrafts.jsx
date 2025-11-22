@@ -1,14 +1,37 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { useOutletContext, Link } from 'react-router-dom'
-import { allBooksData } from '../../data/mockData';
 import BookCard from '../browse/BookCard';
+import { userApi } from '../../services/api';
+import { handleApiError } from '../../services/utils/errorHandler';
 
 const MyDrafts = () => {
-
     const { user } = useOutletContext();
+    const [myDrafts, setMyDrafts] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    //filter for drafts
-    const myDrafts = allBooksData.filter(book => book.authorId === user.id && book.pubStatus === "draft")
+    useEffect(() => {
+      const fetchDrafts = async () => {
+        try {
+          setLoading(true);
+          const response = await userApi.getMyBooks({ pubStatus: 'draft' });
+          setMyDrafts(response.data.books || []);
+        } catch (error) {
+          handleApiError(error);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchDrafts();
+    }, []);
+
+    if (loading) {
+      return (
+        <div className='flex flex-col w-full items-center justify-center min-h-[400px]'>
+          <div className="text-2xl">Loading drafts...</div>
+        </div>
+      );
+    }
 
   return (
     <div className='flex flex-col items-center w-full'>
@@ -29,7 +52,7 @@ const MyDrafts = () => {
         {myDrafts.length > 0 ? (
           myDrafts.map(book => <BookCard key={book.id} book={book} linkTo={`/edit/${book.id}`} />)
         ) : (
-          <p>You have no drafts.</p>
+          <p className="text-lg text-gray-600">You have no drafts. Create a new book to get started!</p>
         )}
       </div>
     </div>

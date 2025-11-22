@@ -5,20 +5,21 @@ import Tags from '../components/landing/Tags';
 import AboutReadian from '../components/landing/AboutReadian';
 import Subscribe from '../components/landing/Subscribe';
 import Help from '../components/landing/Help';
+import { useAuth } from '../services/auth/authContext';
 
 
-const LandingPage = ({signedIn, currentUser}) => {
-
-  const dashboardPath = currentUser?.role === "admin" ? "/admindash" : "/authordash/works";
+const LandingPage = () => {
+  const { user, isAuthenticated } = useAuth();
+  const dashboardPath = user?.role === "admin" ? "/admindash" : "/authordash/works";
 
 
   return (
     <div className='w-full'>
-        <Hero signedIn={signedIn} dashboardPath={dashboardPath}/>
+        <Hero signedIn={isAuthenticated} dashboardPath={dashboardPath}/>
         <Trending />
         <Tags />
         <AboutReadian />
-        <Subscribe signedIn={signedIn} />
+        <Subscribe signedIn={isAuthenticated} />
         <Help />
     </div>
   )

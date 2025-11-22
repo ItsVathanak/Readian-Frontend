@@ -1,35 +1,45 @@
-import React, { useState, useMemo } from 'react';
-import { allBooksData } from '../../data/mockData';
-
-// Import your new components
+import React, { useState, useEffect, useMemo } from 'react';
 import AllWorksCard from './AllWorksCard';
 import RemoveBookPopup from './RemoveBookPopup';
 import BookRemovalCompletePopup from './BookRemovalCompletePopup';
+import { adminApi } from '../../services/api';
+import { handleApiError, showSuccessToast } from '../../services/utils/errorHandler';
 
 function AllWorks() {
-  // --- Filter State ---
+  const [books, setBooks] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [titleFilter, setTitleFilter] = useState('');
   const [authorFilter, setAuthorFilter] = useState('');
-
-  // --- Popup State ---
-  // 1. Stores the {id, title} of the book being removed
-  const [bookToRemove, setBookToRemove] = useState(null); 
-  // 2. Stores the reason from the first popup
+  const [bookToRemove, setBookToRemove] = useState(null);
   const [reason, setReason] = useState('');
-  // 3. Toggles the "Removal complete" popup
   const [showComplete, setShowComplete] = useState(false);
 
-  // Filter the books (only published)
+  useEffect(() => {
+    fetchBooks();
+  }, []);
+
+  const fetchBooks = async () => {
+    try {
+      setLoading(true);
+      const response = await adminApi.getAllBooks();
+      setBooks(response.data.books || []);
+    } catch (error) {
+      handleApiError(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const filteredBooks = useMemo(() => {
-    return allBooksData
+    return books
       .filter(book => book.pubStatus === 'published')
       .filter(book => 
         (book.title || "").toLowerCase().includes(titleFilter.toLowerCase())
       )
       .filter(book => 
-        (book.author || "").toLowerCase().includes(authorFilter.toLowerCase())
+        (book.author?.name || "").toLowerCase().includes(authorFilter.toLowerCase())
       );
-  }, [titleFilter, authorFilter]);
+  }, [books, titleFilter, authorFilter]);
 
   // --- Handler Functions ---
 
@@ -44,26 +54,35 @@ function AllWorks() {
     setReason('');
   };
 
-  // Called by RemoveBookPopup: confirms removal
-  const handleConfirmRemove = () => {
+  const handleConfirmRemove = async () => {
     if (!reason) {
       alert("Please provide a reason for removal.");
       return;
     }
-    // In a real app, send this to your API
-    console.log(`Removing book: ${bookToRemove.title} for reason: ${reason}`);
-    
-    // Show the "Removal complete" popup
-    setShowComplete(true);
+
+    try {
+      await adminApi.deleteBook(bookToRemove.id, { reason });
+      showSuccessToast('Book removed successfully');
+      setShowComplete(true);
+      await fetchBooks(); // Refresh the book list
+    } catch (error) {
+      handleApiError(error);
+    }
   };
 
-  // Called by RemovalCompletePopup: closes all popups
   const handleFinalConfirm = () => {
     setShowComplete(false);
     setBookToRemove(null);
     setReason('');
-    // In a real app, you would re-fetch your data here
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-2xl">Loading books...</div>
+      </div>
+    );
+  }
 
   return (
     <div>

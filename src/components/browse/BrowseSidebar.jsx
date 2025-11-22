@@ -58,32 +58,48 @@ const BrowseSidebar = ({title,setTitle,author,setAuthor,status,setStatus,tags,se
                 <div className='size-[15px]'>
                     <input 
                     type="radio" 
-                    value="Completed" 
-                    checked={status === 'Completed'} 
-                    onChange={(e) => setStatus(e.target.value)} 
+                    value="finished"
+                    checked={status === 'finished'}
+                    onChange={(e) => setStatus(e.target.value)}
                     className='opacity-0 peer absolute'
                     />
                     <svg className=" size-full pointer-events-none" fill="none" viewBox="0 0 15 15">
-                        <circle cx="7.5" cy="7.5" fill={status === "Completed" ? "black" : "white"} r="6.5" stroke="black" strokeWidth="2" />
+                        <circle cx="7.5" cy="7.5" fill={status === "finished" ? "black" : "white"} r="6.5" stroke="black" strokeWidth="2" />
                     </svg>
                 </div>
-                <p>Completed</p>
+                <p>Finished</p>
             </label>
 
             <label className='cursor-pointer flex items-center gap-2'>
                 <div className='size-[15px]'>
                     <input 
                     type="radio" 
-                    value="Ongoing" 
-                    checked={status === 'Ongoing'} 
-                    onChange={(e) => setStatus(e.target.value)} 
+                    value="ongoing"
+                    checked={status === 'ongoing'}
+                    onChange={(e) => setStatus(e.target.value)}
                     className='opacity-0 peer absolute'
                     /> 
                     <svg className=" size-full pointer-events-none" fill="none" viewBox="0 0 15 15">
-                        <circle cx="7.5" cy="7.5" fill={status === "Ongoing" ? "black" : "white"} r="6.5" stroke="black" strokeWidth="2" />
+                        <circle cx="7.5" cy="7.5" fill={status === "ongoing" ? "black" : "white"} r="6.5" stroke="black" strokeWidth="2" />
                     </svg>
                 </div>
                 <p>Ongoing</p>
+            </label>
+
+            <label className='cursor-pointer flex items-center gap-2'>
+                <div className='size-[15px]'>
+                    <input
+                    type="radio"
+                    value="hiatus"
+                    checked={status === 'hiatus'}
+                    onChange={(e) => setStatus(e.target.value)}
+                    className='opacity-0 peer absolute'
+                    />
+                    <svg className=" size-full pointer-events-none" fill="none" viewBox="0 0 15 15">
+                        <circle cx="7.5" cy="7.5" fill={status === "hiatus" ? "black" : "white"} r="6.5" stroke="black" strokeWidth="2" />
+                    </svg>
+                </div>
+                <p>Hiatus</p>
             </label>
 
             {/* <div>
