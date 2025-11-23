@@ -69,14 +69,14 @@ const authApi = {
   },
 
   // Logout current device
-  logout: async () => {
-    const response = await axiosInstance.post('/auth/logout');
+  logout: async (refreshToken) => {
+    const response = await axiosInstance.post('/auth/logout', { refreshToken });
     return response.data;
   },
 
   // Logout all devices
-  logoutAll: async () => {
-    const response = await axiosInstance.post('/auth/logout-all-devices');
+  logoutAll: async (refreshToken) => {
+    const response = await axiosInstance.post('/auth/logout-all-devices', { refreshToken });
     return response.data;
   },
 };

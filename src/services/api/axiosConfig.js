@@ -90,6 +90,7 @@ axiosInstance.interceptors.response.use(
           // Tokens are truly invalid - logout required
           localStorage.removeItem('accessToken');
           localStorage.removeItem('refreshToken');
+          localStorage.removeItem('user');
 
           // Dispatch custom event for graceful logout (instead of hard redirect)
           window.dispatchEvent(new CustomEvent('auth:logout', {

@@ -17,9 +17,27 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // Load user on mount
+  // Initialize auth state from localStorage on mount
   useEffect(() => {
-    loadUser();
+    const initAuth = () => {
+      try {
+        // Try to load cached user data first for immediate UI update
+        const cachedUser = localStorage.getItem('user');
+        const accessToken = localStorage.getItem('accessToken');
+
+        if (cachedUser && accessToken) {
+          setUser(JSON.parse(cachedUser));
+          setIsAuthenticated(true);
+        }
+      } catch (error) {
+        console.error('Failed to load cached user:', error);
+      }
+
+      // Then load fresh user data from API
+      loadUser();
+    };
+
+    initAuth();
   }, []);
 
   // Auto-refresh token every 14 minutes (tokens expire in 15 minutes)
@@ -54,6 +72,7 @@ export const AuthProvider = ({ children }) => {
     const handleAuthLogout = (event) => {
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
+      localStorage.removeItem('user');
       setUser(null);
       setIsAuthenticated(false);
 
@@ -66,18 +85,56 @@ export const AuthProvider = ({ children }) => {
     return () => window.removeEventListener('auth:logout', handleAuthLogout);
   }, []);
 
+  // Check auth state when user returns to tab/window
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden && isAuthenticated) {
+        // User returned to tab - verify auth is still valid
+        const accessToken = localStorage.getItem('accessToken');
+        if (!accessToken) {
+          // Token was cleared while away - logout
+          setUser(null);
+          setIsAuthenticated(false);
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [isAuthenticated]);
+
   const loadUser = async () => {
     try {
       const accessToken = localStorage.getItem('accessToken');
       if (accessToken) {
         const response = await authApi.getCurrentUser();
-        setUser(response.data);
+        const userData = response.data;
+
+        // Cache user data in localStorage for persistence
+        localStorage.setItem('user', JSON.stringify(userData));
+        setUser(userData);
         setIsAuthenticated(true);
+      } else {
+        // No token - not logged in
+        setUser(null);
+        setIsAuthenticated(false);
       }
     } catch (error) {
-      // Token invalid or expired
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
+      // Only clear auth if it's a 401/403 (token invalid)
+      // For network errors or server issues, keep cached auth
+      if (error.status === 401 || error.status === 403) {
+        // Token truly invalid - clear everything
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('user');
+        setUser(null);
+        setIsAuthenticated(false);
+        console.log('Auth cleared: Invalid token');
+      } else {
+        // Network error or server issue - keep cached user
+        console.warn('Failed to verify auth, keeping cached state:', error.message);
+        // User and isAuthenticated already set from cache in initAuth
+      }
     } finally {
       setLoading(false);
     }
@@ -101,8 +158,11 @@ export const AuthProvider = ({ children }) => {
       const { user: userData, tokens } = response.data;
       const { accessToken, refreshToken } = tokens;
 
+      // Store tokens and user data in localStorage for persistence
       localStorage.setItem('accessToken', accessToken);
       localStorage.setItem('refreshToken', refreshToken);
+      localStorage.setItem('user', JSON.stringify(userData));
+
       setUser(userData);
       setIsAuthenticated(true);
 
@@ -116,14 +176,20 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async (logoutAll = false) => {
     try {
+      // Get refresh token before clearing
+      const refreshToken = localStorage.getItem('refreshToken');
+
+      // Call backend logout with refresh token
       if (logoutAll) {
-        await authApi.logoutAll();
+        await authApi.logoutAll(refreshToken);
       } else {
-        await authApi.logout();
+        await authApi.logout(refreshToken);
       }
 
+      // Clear all stored data
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
+      localStorage.removeItem('user');
       setUser(null);
       setIsAuthenticated(false);
 
@@ -132,13 +198,24 @@ export const AuthProvider = ({ children }) => {
       // Still clear local state even if API call fails
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
+      localStorage.removeItem('user');
       setUser(null);
       setIsAuthenticated(false);
+
+      // Show error if it's not a network error
+      if (error.code !== 'ERR_NETWORK') {
+        console.error('Logout error:', error);
+      }
     }
   };
 
   const updateUser = (updatedUserData) => {
-    setUser((prev) => ({ ...prev, ...updatedUserData }));
+    setUser((prev) => {
+      const newUser = { ...prev, ...updatedUserData };
+      // Update localStorage cache
+      localStorage.setItem('user', JSON.stringify(newUser));
+      return newUser;
+    });
   };
 
   const value = {
