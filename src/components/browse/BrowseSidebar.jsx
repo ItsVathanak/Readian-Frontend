@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 const BrowseSidebar = ({title,setTitle,author,setAuthor,status,setStatus,tags,setTags,genre,setGenre,minLikes,setMinLikes}) => {
   const [isOpen, setIsOpen] = useState(false);
 
+
   return (
     <>
       {/* Mobile Filter Toggle Button */}
@@ -15,7 +16,7 @@ const BrowseSidebar = ({title,setTitle,author,setAuthor,status,setStatus,tags,se
         </svg>
       </button>
 
-      {/* Overlay for mobile */}
+      {/* Overlay for mobile - only visible behind sidebar */}
       {isOpen && (
         <div
           className='lg:hidden fixed inset-0 bg-black/50 z-40'
@@ -24,7 +25,9 @@ const BrowseSidebar = ({title,setTitle,author,setAuthor,status,setStatus,tags,se
       )}
 
       {/* Sidebar */}
-      <aside className={`
+      <aside
+        onClick={(e) => e.stopPropagation()}
+        className={`
         fixed lg:sticky
         top-0 lg:top-24
         left-0 lg:left-0
@@ -69,14 +72,14 @@ const BrowseSidebar = ({title,setTitle,author,setAuthor,status,setStatus,tags,se
         </div>
 
         {/* Author filter */}
-        <div>
+        <div className='w-full'>
             <label>Author:</label><br />
             <input 
                 type="text"
                 placeholder='Filter by author'
                 value={author}
                 onChange={(e) => setAuthor(e.target.value)}
-                className='bg-white rounded-[10px] p-2'
+                className='bg-white rounded-[10px] p-2 w-full'
             />
         </div>
 
@@ -184,7 +187,7 @@ const BrowseSidebar = ({title,setTitle,author,setAuthor,status,setStatus,tags,se
               onChange={(e) => setTags(e.target.value)}
               className='bg-white rounded-[10px] p-2 w-full'
             />
-            <small className='text-gray-500 text-xs'>Separate tags with a comma.</small>
+            <small className='text-gray-500 text-xs'>Separate tags with a comma</small>
         </div>
 
         {/* Likes */}

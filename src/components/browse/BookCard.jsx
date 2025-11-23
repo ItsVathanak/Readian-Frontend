@@ -6,6 +6,7 @@ const BookCard = ({book, linkTo}) => {
 // destructure the book and map backend fields to component fields
     const {
         _id,
+        id,
         title,
         publishedDate,
         image,
@@ -15,13 +16,23 @@ const BookCard = ({book, linkTo}) => {
         totalChapters,
         viewCount,
         likes,
+        totalLikes,
+        likesCount,
         isPremium,           // Backend field for premium books
         contentType,         // "kids" or "adult"
-        status               // "draft" or "published"
+        status,              // "draft" or "published"
+        author
     } = book;
 
-    // defnie linkTo - use _id from backend
-    const destination = linkTo || `/book/${_id}`;
+    // Handle multiple possible like field names
+    const displayLikes = likes || totalLikes || likesCount || 0;
+
+    // Handle author name
+    const authorName = book.authorName || author?.name || 'Unknown Author';
+
+    // defnie linkTo - use _id or id from backend
+    const bookId = _id || id;
+    const destination = linkTo || `/book/${bookId}`;
 
     // Handle tags - can be string or array
     const tagsDisplay = Array.isArray(tags)
@@ -79,7 +90,7 @@ const BookCard = ({book, linkTo}) => {
                         {title || "Title unavailable"}
                     </h1>
                     <p className='text-[10px] sm:text-xs truncate'>
-                        By {book.authorName || "Unknown Author"}
+                        By {authorName}
                     </p>
                 </div>
                 <p className='text-[9px] sm:text-[10px] flex-shrink-0 whitespace-nowrap'>
@@ -116,7 +127,7 @@ const BookCard = ({book, linkTo}) => {
                     Views: {viewCount || 0}
                 </p>
                 <p className='text-[9px] sm:text-[10px]'>
-                    Likes: {likes || 0}
+                    Likes: {displayLikes}
                 </p>
             </div>
         </div>

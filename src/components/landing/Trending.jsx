@@ -54,7 +54,8 @@ const Trending = () => {
                 <Link 
                   to={`/book/${book._id}`}
                   key={book._id}
-                  className='w-[210px] h-[340px] bg-none flex flex-col justify-between hover:scale-110 transition-all duration-300'
+                  className='w-[210px] h-[340px] bg-none flex flex-col justify-between hover:scale-110 transition-all duration-300 cursor-pointer relative z-10'
+                  style={{ pointerEvents: 'auto' }}
                 >
                     {/* cover img */}
                     {book.image ? (

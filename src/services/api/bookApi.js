@@ -62,7 +62,34 @@ const bookApi = {
   // Get book chapters
   getBookChapters: async (bookId, params = {}) => {
     const response = await axiosInstance.get(`/books/${bookId}/chapters`, { params });
-    return response.data;
+    console.log('📖 getBookChapters raw response:', response.data);
+
+    // Handle response structure
+    let chapters = [];
+    if (response.data.data?.chapters) {
+      chapters = response.data.data.chapters;
+    } else if (Array.isArray(response.data.data)) {
+      chapters = response.data.data;
+    } else if (response.data.chapters) {
+      chapters = response.data.chapters;
+    }
+
+    // Ensure chapters have proper structure
+    chapters = chapters.map(chapter => ({
+      ...chapter,
+      id: chapter._id || chapter.id
+    }));
+
+    const result = {
+      ...response.data,
+      data: {
+        chapters,
+        pagination: response.data.pagination || response.data.data?.pagination || {}
+      }
+    };
+
+    console.log('✅ getBookChapters transformed result:', result);
+    return result;
   },
 
   // Get specific chapter by number

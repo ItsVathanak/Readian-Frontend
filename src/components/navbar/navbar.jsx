@@ -6,6 +6,7 @@ const Navbar = () => {
   const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const handleLogout = async () => {
     await logout();
@@ -15,6 +16,14 @@ const Navbar = () => {
 
   const closeMobileMenu = () => {
     setMobileMenuOpen(false);
+  };
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/browse?search=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery('');
+    }
   };
 
   return (
@@ -28,14 +37,25 @@ const Navbar = () => {
         </div>
 
         {/* Searchbar - Hidden on mobile, visible on md+ */}
-        <div className='hidden md:flex grow items-center justify-start mx-4 max-w-md'>
-          <input
-            type="text"
-            placeholder='Search'
-            name='search'
-            className='w-full h-10 bg-white border border-gray-300 rounded-[10px] px-4 py-2'
-          />
-        </div>
+        <form onSubmit={handleSearch} className='hidden md:flex grow items-center justify-start mx-4 max-w-md'>
+          <div className='relative w-full'>
+            <input
+              type="text"
+              placeholder='Search books...'
+              name='search'
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className='w-full h-10 bg-white border border-gray-300 rounded-[10px] px-4 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-[#1A5632] focus:border-transparent'
+            />
+            <button
+              type="submit"
+              className='absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-[#1A5632] transition-colors'
+              aria-label="Search"
+            >
+              🔍
+            </button>
+          </div>
+        </form>
 
         {/* Desktop Navigation - Hidden on mobile, visible on lg+ */}
         {isAuthenticated && user ? (
@@ -43,10 +63,10 @@ const Navbar = () => {
             <Link to="/" className='hover:font-semibold transition-all'>Home</Link>
 
             {/* role based link */}
-            {user.role === 'author' && (
+            {user.role?.toLowerCase() === 'author' && (
               <Link to="/authordash" className='hover:font-semibold transition-all'>Dashboard</Link>
             )}
-            {user.role === 'admin' && (
+            {user.role?.toLowerCase() === 'admin' && (
               <Link to="/admindash" className='hover:font-semibold transition-all'>Admin</Link>
             )}
 
@@ -107,22 +127,33 @@ const Navbar = () => {
         <div className='lg:hidden bg-[#C0FFB3] border-t border-black/10'>
           {/* Mobile Search */}
           <div className='px-4 py-3 md:hidden'>
-            <input
-              type="text"
-              placeholder='Search'
-              name='search'
-              className='w-full h-10 bg-white border border-gray-300 rounded-[10px] px-4 py-2'
-            />
+            <form onSubmit={(e) => { handleSearch(e); closeMobileMenu(); }} className='relative'>
+              <input
+                type="text"
+                placeholder='Search books...'
+                name='search'
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className='w-full h-10 bg-white border border-gray-300 rounded-[10px] px-4 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-[#1A5632] focus:border-transparent'
+              />
+              <button
+                type="submit"
+                className='absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-[#1A5632] transition-colors'
+                aria-label="Search"
+              >
+                🔍
+              </button>
+            </form>
           </div>
 
           {isAuthenticated && user ? (
             <nav className='flex flex-col py-2'>
               <Link to="/" onClick={closeMobileMenu} className='px-6 py-3 hover:bg-white/20 transition-all'>Home</Link>
 
-              {user.role?.toLowerCase() === 'author' && (
+              {user.role === 'AUTHOR' && (
                 <Link to="/authordash" onClick={closeMobileMenu} className='px-6 py-3 hover:bg-white/20 transition-all'>Dashboard</Link>
               )}
-              {user.role?.toLowerCase() === 'admin' && (
+              {user.role === 'ADMIN' && (
                 <Link to="/admindash" onClick={closeMobileMenu} className='px-6 py-3 hover:bg-white/20 transition-all'>Admin</Link>
               )}
 

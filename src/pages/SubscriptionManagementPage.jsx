@@ -97,6 +97,14 @@ const SubscriptionManagementPage = () => {
   const currentPlan = subscriptionInfo?.plan || 'free';
   const isActive = subscriptionInfo?.status === 'active';
 
+  if (loading && !subscriptionInfo) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-[#C0FFB3] via-white to-[#FFFDEE] flex items-center justify-center">
+        <div className="text-2xl">Loading subscription details...</div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#C0FFB3] via-white to-[#FFFDEE] py-12 px-4">
       <div className="max-w-6xl mx-auto">

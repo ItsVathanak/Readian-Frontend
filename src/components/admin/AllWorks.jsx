@@ -22,6 +22,8 @@ function AllWorks() {
     try {
       setLoading(true);
       const response = await adminApi.getAllBooks();
+      console.log('📚 Admin getAllBooks response:', response.data);
+      console.log('📖 Total books received:', response.data.books?.length || 0);
       setBooks(response.data.books || []);
     } catch (error) {
       handleApiError(error);
@@ -31,14 +33,36 @@ function AllWorks() {
   };
 
   const filteredBooks = useMemo(() => {
-    return books
-      .filter(book => book.pubStatus === 'published')
-      .filter(book => 
-        (book.title || "").toLowerCase().includes(titleFilter.toLowerCase())
-      )
-      .filter(book => 
-        (book.author?.name || "").toLowerCase().includes(authorFilter.toLowerCase())
-      );
+    console.log('🔍 Filtering books, total:', books.length);
+
+    // Filter for published books - check multiple field names
+    const publishedBooks = books.filter(book => {
+      // Check various possible field names for status
+      const isPublished =
+        book.status === 'published' ||
+        book.pubStatus === 'published' ||
+        book.publicationStatus === 'published';
+
+      if (!isPublished) {
+        console.log('❌ Book not published:', book.title, 'status:', book.status || book.pubStatus);
+      }
+      return isPublished;
+    });
+
+    console.log('✅ Published books:', publishedBooks.length);
+
+    // Apply title filter
+    const titleFiltered = publishedBooks.filter(book =>
+      (book.title || "").toLowerCase().includes(titleFilter.toLowerCase())
+    );
+
+    // Apply author filter
+    const result = titleFiltered.filter(book =>
+      (book.author?.name || "").toLowerCase().includes(authorFilter.toLowerCase())
+    );
+
+    console.log('📊 After filters:', result.length);
+    return result;
   }, [books, titleFilter, authorFilter]);
 
   // --- Handler Functions ---
@@ -61,11 +85,15 @@ function AllWorks() {
     }
 
     try {
-      await adminApi.deleteBook(bookToRemove.id, { reason });
+      const bookId = bookToRemove.id || bookToRemove._id;
+      console.log('🗑️ Deleting book:', bookId, 'Reason:', reason);
+
+      await adminApi.deleteBook(bookId, { reason });
       showSuccessToast('Book removed successfully');
       setShowComplete(true);
       await fetchBooks(); // Refresh the book list
     } catch (error) {
+      console.error('Delete book error:', error);
       handleApiError(error);
     }
   };

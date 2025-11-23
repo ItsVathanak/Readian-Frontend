@@ -41,7 +41,10 @@ function MyWorks() {
 
       <div className="grid grid-cols-1 2xl:grid-cols-2 gap-6 2xl:gap-2 w-full place-items-center">
         {myWorks.length > 0 ? (
-          myWorks.map(book => <BookCard key={book._id || book.id} book={book} linkTo={`/edit/${book._id || book.id}`}/>)
+          myWorks.map(book => {
+            const bookId = book.id || book._id;
+            return <BookCard key={bookId} book={book} linkTo={`/edit/${bookId}`}/>
+          })
         ) : (
           <p className="text-lg text-gray-600">You haven't published any works yet.</p>
         )}

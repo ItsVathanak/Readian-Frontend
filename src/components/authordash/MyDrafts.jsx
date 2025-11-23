@@ -50,7 +50,10 @@ const MyDrafts = () => {
         {/* display */}
         <div className="grid grid-cols-1 2xl:grid-cols-2 gap-6 2xl:gap-2 w-full place-items-center">
         {myDrafts.length > 0 ? (
-          myDrafts.map(book => <BookCard key={book._id || book.id} book={book} linkTo={`/edit/${book._id || book.id}`} />)
+          myDrafts.map(book => {
+            const bookId = book.id || book._id;
+            return <BookCard key={bookId} book={book} linkTo={`/edit/${bookId}`} />
+          })
         ) : (
           <p className="text-lg text-gray-600">You have no drafts. Create a new book to get started!</p>
         )}

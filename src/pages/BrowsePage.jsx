@@ -16,16 +16,49 @@ const BrowsePage = () => {
     const [hasMore, setHasMore] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
 
-    //get tag from url. default all
+    //get tag and search query from url
     const initialTag = searchParams.get('tag') || '';
+    const searchQuery = searchParams.get('search') || '';
 
-    //state for all filters
-    const [title, setTitle] = useState('');
+    //state for all filters - input values (immediate, what user types)
+    const [titleInput, setTitleInput] = useState(searchQuery);
+    const [authorInput, setAuthorInput] = useState('');
+    const [genreInput, setGenreInput] = useState('');
+    const [tagsInput, setTagsInput] = useState(initialTag);
+
+    // Debounced filter values (used for actual API search)
+    const [title, setTitle] = useState(searchQuery);
     const [author, setAuthor] = useState('');
     const [status, setStatus] = useState('All');
     const [tags, setTags] = useState(initialTag);
     const [genre, setGenre] = useState('');
     const [minLikes, setMinLikes] = useState(0);
+
+    // Update title when search query changes
+    useEffect(() => {
+        const newSearchQuery = searchParams.get('search') || '';
+        if (newSearchQuery) {
+            setTitleInput(newSearchQuery);
+            setTitle(newSearchQuery);
+        }
+    }, [searchParams]);
+
+    // Update tags when URL tag parameter changes
+    useEffect(() => {
+        const newTag = searchParams.get('tag') || '';
+        if (newTag) {
+            setTagsInput(newTag);
+            setTags(newTag);
+        }
+    }, [searchParams]);
+
+    // Manual search trigger - called when user presses Enter
+    const handleSearch = () => {
+        setTitle(titleInput);
+        setAuthor(authorInput);
+        setGenre(genreInput);
+        setTags(tagsInput);
+    };
 
     // Observer for infinite scroll
     const observerTarget = useRef(null);
@@ -137,16 +170,16 @@ const BrowsePage = () => {
         <div className='bg-[#FFFDEE] min-h-screen'>
             <div className='flex flex-col lg:flex-row relative'>
                 <BrowseSidebar
-                    title={title}
-                    setTitle={setTitle}
-                    author={author}
-                    setAuthor={setAuthor}
+                    title={titleInput}
+                    setTitle={setTitleInput}
+                    author={authorInput}
+                    setAuthor={setAuthorInput}
                     status={status}
                     setStatus={setStatus}
-                    tags={tags}
-                    setTags={setTags}
-                    genre={genre}
-                    setGenre={setGenre}
+                    tags={tagsInput}
+                    setTags={setTagsInput}
+                    genre={genreInput}
+                    setGenre={setGenreInput}
                     minLikes={minLikes}
                     setMinLikes={setMinLikes}
                 />

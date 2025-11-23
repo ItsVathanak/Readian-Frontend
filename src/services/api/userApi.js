@@ -43,13 +43,67 @@ const userApi = {
   // Get user's books
   getMyBooks: async (params = {}) => {
     const response = await axiosInstance.get('/users/me/books', { params });
-    return response.data;
+    console.log('📚 getMyBooks raw response:', response.data);
+
+    // Handle response structure - could be direct array or wrapped in books property
+    let books = [];
+    if (response.data.data?.books) {
+      books = response.data.data.books;
+    } else if (Array.isArray(response.data.data)) {
+      books = response.data.data;
+    } else if (response.data.books) {
+      books = response.data.books;
+    }
+
+    // Transform _id to id for consistency
+    books = books.map(book => ({
+      ...book,
+      id: book._id || book.id
+    }));
+
+    const result = {
+      ...response.data,
+      data: {
+        books,
+        pagination: response.data.pagination || response.data.data?.pagination || {}
+      }
+    };
+
+    console.log('✅ getMyBooks transformed result:', result);
+    return result;
   },
 
   // Get liked books
   getLikedBooks: async (params = {}) => {
     const response = await axiosInstance.get('/users/me/liked-books', { params });
-    return response.data;
+    console.log('❤️ getLikedBooks raw response:', response.data);
+
+    // Handle response structure
+    let books = [];
+    if (response.data.data?.books) {
+      books = response.data.data.books;
+    } else if (Array.isArray(response.data.data)) {
+      books = response.data.data;
+    } else if (response.data.books) {
+      books = response.data.books;
+    }
+
+    // Transform _id to id
+    books = books.map(book => ({
+      ...book,
+      id: book._id || book.id
+    }));
+
+    const result = {
+      ...response.data,
+      data: {
+        books,
+        pagination: response.data.pagination || response.data.data?.pagination || {}
+      }
+    };
+
+    console.log('✅ getLikedBooks transformed result:', result);
+    return result;
   },
 
   // Change password

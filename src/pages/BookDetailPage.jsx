@@ -2,11 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom';
 import BookDetail from '../components/bookDetail/BookDetail';
 import BookChapters from '../components/bookDetail/BookChapters';
-import BookStats from '../components/bookDetail/BookStats';
-import StarRating from '../components/bookDetail/StarRating';
-import DownloadButton from '../components/bookDetail/DownloadButton';
 import AuthorCard from '../components/bookDetail/AuthorCard';
-import TableOfContents from '../components/bookDetail/TableOfContents';
 import { bookApi } from '../services/api';
 import { useAuth } from '../services/auth/authContext';
 import { handleApiError } from '../services/utils/errorHandler';
@@ -102,31 +98,9 @@ const BookDetailPage = () => {
   return (
     <div className='bg-gradient-to-b from-[#C0FFB3] via-white to-[#FFFDEE] min-h-screen py-8 px-4'>
       <div className='flex flex-col gap-8 max-w-7xl mx-auto'>
-        {/* Book Detail */}
+        {/* Book Detail - Includes all book info, stats, rating, and download */}
         <BookDetail book={book} signedIn={isAuthenticated} currentUser={user}/>
 
-        {/* Book Statistics */}
-        <BookStats book={book} />
-
-        {/* Rating Section */}
-        <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-4xl mx-auto">
-          <h3 className="text-xl font-bold text-gray-800 mb-4">Rate This Book</h3>
-          <StarRating
-            bookId={book._id || book.id}
-            averageRating={book.averageRating || 0}
-            totalRatings={book.totalRatings || 0}
-          />
-        </div>
-
-        {/* Download Button */}
-        <div className="flex justify-center">
-          <DownloadButton
-            bookId={book._id || book.id}
-            bookTitle={book.title}
-            isPremium={book.isPremium}
-            allowDownload={book.allowDownload}
-          />
-        </div>
 
         {/* Author Card */}
         <AuthorCard
@@ -134,18 +108,8 @@ const BookDetailPage = () => {
           bookCount={book.authorBookCount}
         />
 
-        {/* Table of Contents */}
-        <TableOfContents
-          bookId={book._id || book.id}
-          chapters={book.chapters || []}
-          isPremium={book.isPremium}
-          canAccess={canSeePremium}
-        />
-
-        {/* Book Chapters (Original Component) */}
-        <div className="bg-white rounded-xl shadow-lg p-6">
-          <BookChapters chapterList={book.chapters || []} bookId={book._id || book.id}/>
-        </div>
+        {/* Book Chapters - Table of Contents */}
+        <BookChapters chapterList={book.chapters || []} bookId={book._id || book.id}/>
       </div>
     </div>
   )

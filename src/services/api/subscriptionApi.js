@@ -16,11 +16,16 @@ const subscriptionApi = {
     return response.data;
   },
 
-  // Legacy alias for activate
-  subscribe: async (plan, duration = 30) => {
+  // Legacy alias for activate - accepts object or separate parameters
+  subscribe: async (planOrObj, duration = 30) => {
+    // Support both calling styles:
+    // subscribe({ plan: 'basic', duration: 30 }) OR subscribe('basic', 30)
+    const plan = typeof planOrObj === 'object' ? planOrObj.plan : planOrObj;
+    const dur = typeof planOrObj === 'object' ? planOrObj.duration : duration;
+
     const response = await axiosInstance.post('/subscriptions/activate', {
       plan,
-      duration
+      duration: dur
     });
     return response.data;
   },
@@ -38,6 +43,12 @@ const subscriptionApi = {
   // Check subscription status
   checkSubscriptionStatus: async () => {
     const response = await axiosInstance.get('/subscriptions/status');
+    return response.data;
+  },
+
+  // Cancel subscription
+  cancelSubscription: async () => {
+    const response = await axiosInstance.post('/subscriptions/cancel');
     return response.data;
   },
 };
