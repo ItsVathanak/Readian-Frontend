@@ -102,7 +102,7 @@ const Navbar = () => {
             <Link to="/instruction" className='hover:font-semibold transition-all'>Help</Link>
             <Link
               to="/signup"
-              className='bg-[#1A5632] text-white px-4 py-2 rounded-lg hover:bg-[#FFD7DF] hover:text-[#1A5632] transition-all'
+              className='hover:font-semibold transition-all'
             >
               Sign Up
             </Link>
