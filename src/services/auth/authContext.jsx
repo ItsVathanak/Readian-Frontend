@@ -22,6 +22,50 @@ export const AuthProvider = ({ children }) => {
     loadUser();
   }, []);
 
+  // Auto-refresh token every 14 minutes (tokens expire in 15 minutes)
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    const refreshInterval = setInterval(async () => {
+      try {
+        const refreshToken = localStorage.getItem('refreshToken');
+        if (refreshToken) {
+          const response = await authApi.refreshToken({ refreshToken });
+          // Backend returns: { data: { tokens: { accessToken, refreshToken } } }
+          const { tokens } = response.data;
+          const { accessToken: newAccessToken, refreshToken: newRefreshToken } = tokens;
+          localStorage.setItem('accessToken', newAccessToken);
+          if (newRefreshToken) {
+            localStorage.setItem('refreshToken', newRefreshToken);
+          }
+        }
+      } catch (error) {
+        console.error('Token refresh failed:', error);
+        // Don't logout user on refresh failure, let them continue
+        // They will be logged out when they make next API call with expired token
+      }
+    }, 14 * 60 * 1000); // 14 minutes
+
+    return () => clearInterval(refreshInterval);
+  }, [isAuthenticated]);
+
+  // Listen for logout events from axios interceptor (when tokens expire)
+  useEffect(() => {
+    const handleAuthLogout = (event) => {
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      setUser(null);
+      setIsAuthenticated(false);
+
+      // Show user-friendly message
+      const reason = event.detail?.reason || 'Session expired. Please login again.';
+      showSuccessToast(reason);
+    };
+
+    window.addEventListener('auth:logout', handleAuthLogout);
+    return () => window.removeEventListener('auth:logout', handleAuthLogout);
+  }, []);
+
   const loadUser = async () => {
     try {
       const accessToken = localStorage.getItem('accessToken');
@@ -53,7 +97,9 @@ export const AuthProvider = ({ children }) => {
   const login = async (credentials) => {
     try {
       const response = await authApi.login(credentials);
-      const { accessToken, refreshToken, user: userData } = response.data;
+      // Backend returns: { data: { user: {...}, tokens: { accessToken, refreshToken } } }
+      const { user: userData, tokens } = response.data;
+      const { accessToken, refreshToken } = tokens;
 
       localStorage.setItem('accessToken', accessToken);
       localStorage.setItem('refreshToken', refreshToken);

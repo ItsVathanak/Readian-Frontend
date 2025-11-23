@@ -101,8 +101,17 @@ function ForgotPasswordPage() {
       return;
     }
 
-    if (newPassword.length < 6) {
-      showErrorToast('Password must be at least 6 characters long');
+    // Password validation
+    if (newPassword.length < 8) {
+      showErrorToast('Password must be at least 8 characters long');
+      return;
+    }
+    if (!/[A-Z]/.test(newPassword)) {
+      showErrorToast('Password must include at least one uppercase letter');
+      return;
+    }
+    if (!/[0-9]/.test(newPassword)) {
+      showErrorToast('Password must include at least one number');
       return;
     }
 
@@ -244,7 +253,7 @@ function ForgotPasswordPage() {
                   required
                   minLength={6}
                 />
-                <p className="text-xs text-gray-600 mt-1">Minimum 6 characters</p>
+                <p className="text-xs text-gray-600 mt-1">Minimum 8 characters, must include one uppercase and one number</p>
               </div>
 
               <div>

@@ -4,7 +4,7 @@ import { createFormData } from '../utils/apiHelpers';
 const chapterApi = {
   // Get chapter by ID
   getChapterById: async (chapterId) => {
-    const response = await axiosInstance.get(`/books/chapters/${chapterId}`);
+    const response = await axiosInstance.get(`/books/${bookId}/chapters/${chapterId}`);
     return response.data;
   },
 
@@ -20,7 +20,7 @@ const chapterApi = {
   // Update chapter (Author only)
   updateChapter: async (chapterId, chapterData) => {
     const formData = createFormData(chapterData);
-    const response = await axiosInstance.put(`/books/chapters/${chapterId}`, formData, {
+    const response = await axiosInstance.put(`/books/${bookId}/chapters/${chapterId}`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
     return response.data;
@@ -28,14 +28,14 @@ const chapterApi = {
 
   // Delete chapter (Author only)
   deleteChapter: async (chapterId) => {
-    const response = await axiosInstance.delete(`/books/chapters/${chapterId}`);
+    const response = await axiosInstance.delete(`/books/${bookId}/chapters/${chapterId}`);
     return response.data;
   },
 
   // Upload chapter PDF
   uploadChapterPDF: async (chapterId, file) => {
     const formData = createFormData({ pdf: file });
-    const response = await axiosInstance.post(`/books/chapters/${chapterId}/pdf`, formData, {
+    const response = await axiosInstance.post(`/books/${bookId}/chapters/${chapterId}/pdf`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
     return response.data;

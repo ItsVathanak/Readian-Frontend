@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import RemoveUserPopup from './RemoveUserPopup';
 import UserRemovalCompletePopup from './UserRemovalCompletePopup';
+import EditUserModal from './EditUserModal';
+import { Edit, Trash2, User, Mail, Calendar } from 'lucide-react';
 import { adminApi } from '../../services/api';
 import { handleApiError, showSuccessToast } from '../../services/utils/errorHandler';
 
@@ -10,6 +12,7 @@ function AllUsers() {
   const [usernameFilter, setUsernameFilter] = useState('');
   const [idFilter, setIdFilter] = useState('');
   const [userToRemove, setUserToRemove] = useState(null);
+  const [userToEdit, setUserToEdit] = useState(null);
   const [reason, setReason] = useState('');
   const [showComplete, setShowComplete] = useState(false);
 
@@ -133,12 +136,22 @@ function AllUsers() {
                 </td>
                 <td className="p-2">{user.booksCount || 0}</td>
                 <td className="p-2 text-center">
-                  <button 
-                    onClick={() => handleRemoveClick(user)}
-                    className="bg-red-500 text-[#FFD7DF] text-sm py-1 px-3 rounded hover:bg-[#FFD7DF] hover:text-red-500 transition-all duration-300"
-                  >
-                    Remove
-                  </button>
+                  <div className="flex gap-2 justify-center">
+                    <button
+                      onClick={() => setUserToEdit(user)}
+                      className="bg-blue-500 text-white text-sm py-1 px-3 rounded hover:bg-blue-600 transition-colors flex items-center gap-1"
+                    >
+                      <Edit className="w-4 h-4" />
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleRemoveClick(user)}
+                      className="bg-red-500 text-white text-sm py-1 px-3 rounded hover:bg-red-600 transition-colors flex items-center gap-1"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                      Remove
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
@@ -165,6 +178,14 @@ function AllUsers() {
           user={userToRemove}
           reason={reason}
           onConfirm={handleFinalConfirm}
+        />
+      )}
+
+      {userToEdit && (
+        <EditUserModal
+          user={userToEdit}
+          onClose={() => setUserToEdit(null)}
+          onSuccess={fetchUsers}
         />
       )}
     </div>

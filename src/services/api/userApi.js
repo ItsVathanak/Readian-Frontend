@@ -10,14 +10,15 @@ const userApi = {
 
   // Update user profile
   updateProfile: async (profileData) => {
-    const response = await axiosInstance.put('/users/profile', profileData);
+    const response = await axiosInstance.patch('/users/me', profileData);
     return response.data;
   },
 
   // Update avatar
   updateAvatar: async (file) => {
-    const formData = createFormData({ avatar: file });
-    const response = await axiosInstance.put('/users/avatar', formData, {
+    const formData = new FormData();
+    formData.append('avatar', file);
+    const response = await axiosInstance.patch('/users/me/profile-image', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
     return response.data;
@@ -25,8 +26,9 @@ const userApi = {
 
   // Update cover image
   updateCoverImage: async (file) => {
-    const formData = createFormData({ coverImage: file });
-    const response = await axiosInstance.put('/users/cover', formData, {
+    const formData = new FormData();
+    formData.append('coverImage', file);
+    const response = await axiosInstance.patch('/users/me/cover-image', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
     return response.data;
@@ -34,25 +36,52 @@ const userApi = {
 
   // Become an author
   becomeAuthor: async () => {
-    const response = await axiosInstance.post('/users/become-author');
+    const response = await axiosInstance.post('/users/me/become-author');
     return response.data;
   },
 
   // Get user's books
   getMyBooks: async (params = {}) => {
-    const response = await axiosInstance.get('/users/my-books', { params });
+    const response = await axiosInstance.get('/users/me/books', { params });
     return response.data;
   },
 
   // Get liked books
   getLikedBooks: async (params = {}) => {
-    const response = await axiosInstance.get('/users/liked-books', { params });
+    const response = await axiosInstance.get('/users/me/liked-books', { params });
     return response.data;
   },
 
-  // Get author stats
+  // Change password
+  changePassword: async (currentPassword, newPassword) => {
+    const response = await axiosInstance.post('/users/me/change-password', {
+      currentPassword,
+      newPassword,
+    });
+    return response.data;
+  },
+
+  // Get all users (Admin only)
+  getAllUsers: async (params = {}) => {
+    const response = await axiosInstance.get('/users', { params });
+    return response.data;
+  },
+
+  // Update user by admin
+  updateUserByAdmin: async (userId, userData) => {
+    const response = await axiosInstance.patch(`/users/${userId}`, userData);
+    return response.data;
+  },
+
+  // Delete user (Admin only)
+  deleteUser: async (userId) => {
+    const response = await axiosInstance.delete(`/users/${userId}`);
+    return response.data;
+  },
+
+  // Get author statistics (for authors only)
   getAuthorStats: async () => {
-    const response = await axiosInstance.get('/users/author-stats');
+    const response = await axiosInstance.get('/users/me/author-stats');
     return response.data;
   },
 };

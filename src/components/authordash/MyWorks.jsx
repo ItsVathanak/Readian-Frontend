@@ -41,7 +41,7 @@ function MyWorks() {
 
       <div className="grid grid-cols-1 2xl:grid-cols-2 gap-6 2xl:gap-2 w-full place-items-center">
         {myWorks.length > 0 ? (
-          myWorks.map(book => <BookCard key={book.id} book={book} linkTo={`/edit/${book.id}`}/>)
+          myWorks.map(book => <BookCard key={book._id || book.id} book={book} linkTo={`/edit/${book._id || book.id}`}/>)
         ) : (
           <p className="text-lg text-gray-600">You haven't published any works yet.</p>
         )}

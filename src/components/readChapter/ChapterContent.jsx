@@ -12,8 +12,8 @@ const ChapterContent = ({chapter,bookId,book,prevChapter,nextChapter}) => {
 
 
   return (
-    <div className='relative w-[1000px] min-h-8/12 bg-[#FFD7DF] rounded-tr-[100px] rounded-bl-[100px]'>
-        
+    <div className='relative w-full max-w-[1200px] mx-4 md:mx-auto min-h-8/12 bg-[#FFD7DF] rounded-tr-[50px] md:rounded-tr-[100px] rounded-bl-[50px] md:rounded-bl-[100px]'>
+
         {/* Corner Section */}
         <div className='absolute top-0 left-0 bg-[#1A5632] w-[230px] h-[115px] rounded-br-[50px] flex justify-center items-center'>
             {/* text */}
@@ -37,13 +37,13 @@ const ChapterContent = ({chapter,bookId,book,prevChapter,nextChapter}) => {
         </div>
 
         {/* Chapter detail */}
-        <div className='relative pb-[50px] pt-[115px] px-[250px] flex flex-col items-center text-center z-20'>
+        <div className='relative pb-8 sm:pb-12 md:pb-[50px] pt-[90px] sm:pt-[115px] px-4 sm:px-8 md:px-16 lg:px-[250px] flex flex-col items-center text-center z-20'>
             <h1 className='geist text-[28px] font-semibold'>
                 {chapter.title || "No Title"}
             </h1><br />
             <div className='flex justify-center w-full'>
                 <p>
-                    Author: {book.author || "No Author"}
+                    Author: {book.author?.name || "No Author"}
                 </p>
             </div>
             <br />
@@ -59,7 +59,7 @@ const ChapterContent = ({chapter,bookId,book,prevChapter,nextChapter}) => {
         </div>
 
         {/* Chapter content */}
-        <div className='bg-white py-[50px] px-[250px] rounded-bl-[100px] flex flex-col gap-[50px]'>
+        <div className='bg-white py-8 sm:py-12 md:py-[50px] px-4 sm:px-8 md:px-16 lg:px-[250px] rounded-bl-[50px] md:rounded-bl-[100px] flex flex-col gap-8 md:gap-[50px]'>
             <p className='text-[16px]'>
                 {chapter.content || "This chapter has no content."}
             </p>
@@ -69,7 +69,7 @@ const ChapterContent = ({chapter,bookId,book,prevChapter,nextChapter}) => {
                 {/* previous button */}
                 {prevChapter ? (
                     <Link 
-                        to={`/book/${bookId}/chapter/${prevChapter.id}`} 
+                        to={`/book/${bookId}/chapter/${prevChapter.chapterNumber}`}
                         className='geist text-[16px] font-medium hover:underline'
                     >
                     Previous
@@ -88,7 +88,7 @@ const ChapterContent = ({chapter,bookId,book,prevChapter,nextChapter}) => {
                 {/* next button */}
                 {nextChapter ? (
                     <Link
-                        to={`/book/${bookId}/chapter/${nextChapter.id}`}
+                        to={`/book/${bookId}/chapter/${nextChapter.chapterNumber}`}
                         className='geist text-[16px] font-medium hover:underline'
                     >
                         Next

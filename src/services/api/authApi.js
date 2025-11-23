@@ -33,7 +33,7 @@ const authApi = {
 
   // Verify reset code
   verifyResetCode: async (email, code) => {
-    const response = await axiosInstance.post('/auth/verify-reset-code', { email, code });
+    const response = await axiosInstance.post('/auth/verify-password-reset-code', { email, code });
     return response.data;
   },
 
@@ -76,7 +76,7 @@ const authApi = {
 
   // Logout all devices
   logoutAll: async () => {
-    const response = await axiosInstance.post('/auth/logout-all');
+    const response = await axiosInstance.post('/auth/logout-all-devices');
     return response.data;
   },
 };

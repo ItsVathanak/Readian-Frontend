@@ -15,6 +15,7 @@ const MyAccount = () => {
     name: user?.name || "",
     email: user?.email || "",
     bio: user?.bio || "",
+    age: user?.age || "",
   });
 
   const handleChange = (e) => {
@@ -153,11 +154,11 @@ const MyAccount = () => {
 
           <div className="space-y-6 text-xl">
             <div className="flex items-center">
-              <label className="w-48 font-semibold text-black">Username:</label>
+              <label className="w-48 font-semibold text-black">Name:</label>
               <input
                 type="text"
-                name="username"
-                value={profile.username}
+                name="name"
+                value={profile.name}
                 onChange={handleChange}
                 className="flex-1 px-3 py-2 border border-black rounded-lg"
               />
@@ -175,21 +176,23 @@ const MyAccount = () => {
             </div>
 
             <div className="flex items-center">
-              <label className="w-48 font-semibold text-black">Date of Birth:</label>
+              <label className="w-48 font-semibold text-black">Age:</label>
               <input
-                type="text"
-                name="dateOfBirth"
-                value={profile.dateOfBirth}
+                type="number"
+                name="age"
+                value={profile.age}
                 onChange={handleChange}
+                min="13"
+                max="150"
                 className="flex-1 px-3 py-2 border border-black rounded-lg"
               />
             </div>
 
             <div className="flex items-start">
-              <label className="w-48 font-semibold text-black">About Me:</label>
+              <label className="w-48 font-semibold text-black">Bio:</label>
               <textarea
-                name="aboutMe"
-                value={profile.aboutMe}
+                name="bio"
+                value={profile.bio}
                 onChange={handleChange}
                 className="flex-1 px-3 py-2 border border-black rounded-lg min-h-[120px]"
               />

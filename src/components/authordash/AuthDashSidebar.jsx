@@ -37,6 +37,9 @@ const AuthDashSidebar = ({currentUser}) => {
           <NavLink to="liked" className={({ isActive }) => isActive ? activeLinkStyle : unactiveLinkStyle}>
             My Liked
           </NavLink>
+          <NavLink to="analytics" className={({ isActive }) => isActive ? activeLinkStyle : unactiveLinkStyle}>
+            Analytics
+          </NavLink>
 
         </nav>
     </aside>

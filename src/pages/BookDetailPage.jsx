@@ -2,6 +2,11 @@ import React, { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom';
 import BookDetail from '../components/bookDetail/BookDetail';
 import BookChapters from '../components/bookDetail/BookChapters';
+import BookStats from '../components/bookDetail/BookStats';
+import StarRating from '../components/bookDetail/StarRating';
+import DownloadButton from '../components/bookDetail/DownloadButton';
+import AuthorCard from '../components/bookDetail/AuthorCard';
+import TableOfContents from '../components/bookDetail/TableOfContents';
 import { bookApi } from '../services/api';
 import { useAuth } from '../services/auth/authContext';
 import { handleApiError } from '../services/utils/errorHandler';
@@ -69,15 +74,20 @@ const BookDetailPage = () => {
   }
 
   // Check premium access
-  const isPremium = book.premiumStatus === 'premium';
-  const canSeePremium = user?.role === 'admin' || user?.subscriptionStatus === 'active';
+  const isPremium = book.isPremium;
+  const canSeePremium = user?.role === 'admin' || (
+    user?.subscriptionStatus === 'active' &&
+    user?.plan === 'premium' &&
+    user?.subscriptionExpiresAt &&
+    new Date(user.subscriptionExpiresAt) > new Date()
+  );
 
   if (isPremium && !canSeePremium) {
     return (
       <div className="bg-[#CEF17B] min-h-screen p-8 text-center">
         <h1 className="text-3xl font-bold mb-4">Access Denied</h1>
         <p className="text-xl mb-6">
-          This book is for premium members only.
+          This content requires an active premium subscription.
         </p>
         <Link 
           to="/subscribe"
@@ -90,12 +100,53 @@ const BookDetailPage = () => {
   }
 
   return (
-    <div className='bg-[#1A5632] flex flex-col gap-[50px] py-[100px] items-center'>
+    <div className='bg-gradient-to-b from-[#C0FFB3] via-white to-[#FFFDEE] min-h-screen py-8 px-4'>
+      <div className='flex flex-col gap-8 max-w-7xl mx-auto'>
         {/* Book Detail */}
         <BookDetail book={book} signedIn={isAuthenticated} currentUser={user}/>
 
-        {/* Book Chapters */}
-        <BookChapters chapterList={book.chapters || []} bookId={book.id}/>
+        {/* Book Statistics */}
+        <BookStats book={book} />
+
+        {/* Rating Section */}
+        <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-4xl mx-auto">
+          <h3 className="text-xl font-bold text-gray-800 mb-4">Rate This Book</h3>
+          <StarRating
+            bookId={book._id || book.id}
+            averageRating={book.averageRating || 0}
+            totalRatings={book.totalRatings || 0}
+          />
+        </div>
+
+        {/* Download Button */}
+        <div className="flex justify-center">
+          <DownloadButton
+            bookId={book._id || book.id}
+            bookTitle={book.title}
+            isPremium={book.isPremium}
+            allowDownload={book.allowDownload}
+          />
+        </div>
+
+        {/* Author Card */}
+        <AuthorCard
+          author={book.author}
+          bookCount={book.authorBookCount}
+        />
+
+        {/* Table of Contents */}
+        <TableOfContents
+          bookId={book._id || book.id}
+          chapters={book.chapters || []}
+          isPremium={book.isPremium}
+          canAccess={canSeePremium}
+        />
+
+        {/* Book Chapters (Original Component) */}
+        <div className="bg-white rounded-xl shadow-lg p-6">
+          <BookChapters chapterList={book.chapters || []} bookId={book._id || book.id}/>
+        </div>
+      </div>
     </div>
   )
 }

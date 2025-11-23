@@ -9,4 +9,3 @@ const healthApi = {
 };
 
 export default healthApi;
-

@@ -1,17 +1,9 @@
 import axiosInstance from './axiosConfig';
 
 const downloadApi = {
-  // Download a chapter
-  downloadChapter: async (chapterId) => {
-    const response = await axiosInstance.get(`/downloads/chapter/${chapterId}`, {
-      responseType: 'blob',
-    });
-    return response.data;
-  },
-
-  // Download entire book
+  // Download entire book (corrected endpoint)
   downloadBook: async (bookId) => {
-    const response = await axiosInstance.get(`/downloads/book/${bookId}`, {
+    const response = await axiosInstance.get(`/books/${bookId}/download`, {
       responseType: 'blob',
     });
     return response.data;
@@ -23,9 +15,15 @@ const downloadApi = {
     return response.data;
   },
 
-  // Check download eligibility
-  checkDownloadEligibility: async (chapterId) => {
-    const response = await axiosInstance.get(`/downloads/check/${chapterId}`);
+  // Get download stats (premium users)
+  getDownloadStats: async () => {
+    const response = await axiosInstance.get('/downloads/stats');
+    return response.data;
+  },
+
+  // Get author download analytics
+  getAuthorDownloadAnalytics: async (params = {}) => {
+    const response = await axiosInstance.get('/downloads/analytics', { params });
     return response.data;
   },
 };

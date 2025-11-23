@@ -2,44 +2,26 @@ import axiosInstance from './axiosConfig';
 
 const ratingApi = {
   // Rate a book
-  rateBook: async (bookId, rating, review) => {
-    const response = await axiosInstance.post(`/ratings/${bookId}`, {
-      rating,
-      review,
-    });
+  rateBook: async (bookId, ratingData) => {
+    const response = await axiosInstance.post(`/books/${bookId}/rate`, ratingData);
     return response.data;
   },
 
-  // Update rating
-  updateRating: async (bookId, rating, review) => {
-    const response = await axiosInstance.put(`/ratings/${bookId}`, {
-      rating,
-      review,
-    });
-    return response.data;
-  },
-
-  // Delete rating
+  // Delete rating (backend uses same endpoint with DELETE method)
   deleteRating: async (bookId) => {
-    const response = await axiosInstance.delete(`/ratings/${bookId}`);
+    const response = await axiosInstance.delete(`/books/${bookId}/rate`);
     return response.data;
   },
 
-  // Get book ratings
+  // Get book ratings (all ratings for a book)
   getBookRatings: async (bookId, params = {}) => {
-    const response = await axiosInstance.get(`/ratings/${bookId}`, { params });
+    const response = await axiosInstance.get(`/books/${bookId}/ratings`, { params });
     return response.data;
   },
 
   // Get user's rating for a book
   getUserRating: async (bookId) => {
-    const response = await axiosInstance.get(`/ratings/${bookId}/my-rating`);
-    return response.data;
-  },
-
-  // Get all ratings by user
-  getUserRatings: async (params = {}) => {
-    const response = await axiosInstance.get('/ratings/my-ratings', { params });
+    const response = await axiosInstance.get(`/books/${bookId}/rating/me`);
     return response.data;
   },
 };

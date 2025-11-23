@@ -1,34 +1,29 @@
 import axiosInstance from './axiosConfig';
 
 const subscriptionApi = {
-  // Get current user's subscription
-  getMySubscription: async () => {
-    const response = await axiosInstance.get('/subscriptions/my-subscription');
+  // Get current user's subscription status
+  getStatus: async () => {
+    const response = await axiosInstance.get('/subscriptions/status');
     return response.data;
   },
 
-  // Get all subscription plans
-  getPlans: async () => {
-    const response = await axiosInstance.get('/subscriptions/plans');
-    return response.data;
-  },
-
-  // Subscribe to a plan
-  subscribe: async (planId, paymentData) => {
-    const response = await axiosInstance.post('/subscriptions/subscribe', {
-      planId,
-      ...paymentData,
+  // Subscribe/activate a plan
+  activate: async (plan, duration = 30) => {
+    const response = await axiosInstance.post('/subscriptions/activate', {
+      plan,      // "basic" or "premium"
+      duration   // number of days (30, 90, 365)
     });
     return response.data;
   },
 
-  // Cancel subscription
-  cancelSubscription: async () => {
-    const response = await axiosInstance.post('/subscriptions/cancel');
+  // Legacy alias for activate
+  subscribe: async (plan, duration = 30) => {
+    const response = await axiosInstance.post('/subscriptions/activate', {
+      plan,
+      duration
+    });
     return response.data;
   },
-
-  // Renew subscription
   renewSubscription: async (paymentData) => {
     const response = await axiosInstance.post('/subscriptions/renew', paymentData);
     return response.data;

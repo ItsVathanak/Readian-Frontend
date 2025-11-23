@@ -13,12 +13,32 @@ const axiosInstance = axios.create({
   timeout: 30000,
 });
 
-// Request interceptor - Add auth token to requests
+// Public routes that don't need authentication
+const PUBLIC_ROUTES = [
+  '/auth/register',
+  '/auth/login',
+  '/auth/verify-email',
+  '/auth/resend-verification',
+  '/auth/forgot-password',
+  '/auth/verify-password-reset-code',
+  '/auth/reset-password',
+  '/auth/refresh-token',
+];
+
+// Check if a URL is a public route
+const isPublicRoute = (url) => {
+  return PUBLIC_ROUTES.some(route => url.includes(route));
+};
+
+// Request interceptor - Add auth token to requests (except public routes)
 axiosInstance.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('accessToken');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    // Don't add token to public routes
+    if (!isPublicRoute(config.url)) {
+      const token = localStorage.getItem('accessToken');
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
     }
     return config;
   },
@@ -33,36 +53,57 @@ axiosInstance.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // Handle token expiration
+    // Handle token expiration (401 Unauthorized)
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
       try {
         const refreshToken = localStorage.getItem('refreshToken');
-        if (refreshToken) {
-          const response = await axios.post(`${API_BASE_URL}/auth/refresh-token`, {
-            refreshToken,
-          });
 
-          const { accessToken } = response.data.data;
-          localStorage.setItem('accessToken', accessToken);
-
-          // Retry original request with new token
-          originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-          return axiosInstance(originalRequest);
+        // If no refresh token, don't try to refresh
+        if (!refreshToken) {
+          return Promise.reject(error);
         }
+
+        // Attempt to refresh token silently in background
+        const response = await axios.post(`${API_BASE_URL}/auth/refresh-token`, {
+          refreshToken,
+        });
+
+        // Backend returns: { success: true, data: { tokens: { accessToken, refreshToken } } }
+        const { tokens } = response.data.data;
+        const { accessToken, refreshToken: newRefreshToken } = tokens;
+
+        // Save new tokens
+        localStorage.setItem('accessToken', accessToken);
+        if (newRefreshToken) {
+          localStorage.setItem('refreshToken', newRefreshToken);
+        }
+
+        // Retry original request with new token
+        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+        return axiosInstance(originalRequest);
+
       } catch (refreshError) {
-        // Refresh failed - clear tokens and redirect to login
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
-        window.location.href = '/signin';
+        // Only logout if refresh token is actually invalid (401 or 403)
+        if (refreshError.response?.status === 401 || refreshError.response?.status === 403) {
+          // Tokens are truly invalid - logout required
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('refreshToken');
+
+          // Dispatch custom event for graceful logout (instead of hard redirect)
+          window.dispatchEvent(new CustomEvent('auth:logout', {
+            detail: { reason: 'Session expired. Please login again.' }
+          }));
+        }
+        // For other errors (network, server down, etc), just reject without logout
         return Promise.reject(refreshError);
       }
     }
 
-    // Format error response
+    // Format error response for user-friendly messages
     const formattedError = {
-      message: error.response?.data?.message || 'An error occurred',
+      message: error.response?.data?.message || error.message || 'An error occurred',
       code: error.response?.data?.code,
       status: error.response?.status,
       errors: error.response?.data?.errors,

@@ -55,7 +55,7 @@ const bookApi = {
 
   // Unlike a book
   unlikeBook: async (bookId) => {
-    const response = await axiosInstance.delete(`/books/${bookId}/like`);
+    const response = await axiosInstance.post(`/books/${bookId}/unlike`);
     return response.data;
   },
 
@@ -65,11 +65,16 @@ const bookApi = {
     return response.data;
   },
 
-  // Search books
-  searchBooks: async (searchQuery, params = {}) => {
-    const response = await axiosInstance.get('/books/search', {
-      params: { q: searchQuery, ...params },
-    });
+  // Get specific chapter by number
+  getChapterByNumber: async (bookId, chapterNumber) => {
+    const response = await axiosInstance.get(`/books/${bookId}/chapters/${chapterNumber}`);
+    return response.data;
+  },
+
+  // Search books with advanced filters
+  searchBooks: async (filters = {}) => {
+    // Backend expects: title, author, genre, tags, page, limit
+    const response = await axiosInstance.get('/books/search', { params: filters });
     return response.data;
   },
 
@@ -103,6 +108,32 @@ const bookApi = {
       params: { sort: 'popular', ...params },
     });
     return response.data;
+  },
+
+  // Rate a book (1-5 stars)
+  rateBook: async (bookId, rating) => {
+    const response = await axiosInstance.post(`/books/${bookId}/rate`, { rating });
+    return response.data;
+  },
+
+  // Get user's rating for a book
+  getMyRating: async (bookId) => {
+    const response = await axiosInstance.get(`/books/${bookId}/rating/me`);
+    return response.data;
+  },
+
+  // Delete user's rating
+  deleteRating: async (bookId) => {
+    const response = await axiosInstance.delete(`/books/${bookId}/rate`);
+    return response.data;
+  },
+
+  // Download a book as PDF (premium feature)
+  downloadBook: async (bookId) => {
+    const response = await axiosInstance.post(`/books/${bookId}/download`, {}, {
+      responseType: 'blob' // Important for file downloads
+    });
+    return response;
   },
 };
 

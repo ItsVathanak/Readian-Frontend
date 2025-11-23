@@ -41,7 +41,7 @@ const MyLiked = () => {
         {/* display */}
         <div className="grid grid-cols-1 2xl:grid-cols-2 gap-6 2xl:gap-2 w-full place-items-center">
             {likedBooks.length > 0 ? (
-                likedBooks.map(book => <BookCard key={book.id} book={book} />)
+                likedBooks.map(book => <BookCard key={book._id || book.id} book={book} />)
             ) : (
                 <p className='text-[16px] font-semibold'>
                     You haven&quot;t liked any works yet!

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useLocation, Navigate, useNavigate } from 'react-router-dom';
 import PaymentSuccessPopup from '../components/PaymentConfirm/PaymentSuccessPopup';
 import { useAuth } from '../services/auth/authContext';
-import { subscriptionApi } from '../services/api';
+import { subscriptionApi, authApi } from '../services/api';
 import { handleApiError, showSuccessToast } from '../services/utils/errorHandler';
 
 function ConfirmPaymentPage() {
@@ -26,7 +26,7 @@ function ConfirmPaymentPage() {
     return <Navigate to="/signin" state={{ from: '/confirm-payment' }} replace />;
   }
 
-  const { planId, planName, price } = planData;
+  const { planId, planName, price, duration = 30 } = planData;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -34,18 +34,23 @@ function ConfirmPaymentPage() {
     try {
       setLoading(true);
 
-      // Mock payment data - in real app, this would come from payment gateway
-      const paymentData = {
-        paymentMethod: 'card',
-        // Add other payment details as needed
-      };
+      // Map planId/planName to the plan type expected by backend
+      // planId should be "basic" or "premium"
+      let plan = planId;
 
-      await subscriptionApi.subscribe(planId, paymentData);
+      // If planId is not "basic" or "premium", try to determine from planName
+      if (plan !== 'basic' && plan !== 'premium') {
+        plan = planName?.toLowerCase().includes('premium') ? 'premium' : 'basic';
+      }
 
-      // Update user subscription status
-      updateUser({ subscriptionStatus: 'active' });
+      // Call the backend to activate subscription
+      const response = await subscriptionApi.subscribe(plan, duration);
 
-      showSuccessToast('Subscription successful!');
+      // Refresh user data from backend to get updated subscription info
+      const userResponse = await authApi.getCurrentUser();
+      updateUser(userResponse.data);
+
+      showSuccessToast(`${planName} subscription activated successfully!`);
       setShowSuccess(true);
     } catch (error) {
       handleApiError(error);
