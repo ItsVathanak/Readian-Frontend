@@ -13,7 +13,7 @@ function MyWorks() {
     const fetchMyBooks = async () => {
       try {
         setLoading(true);
-        const response = await userApi.getMyBooks({ status: 'published' });
+        const response = await userApi.getMyBooks({ pubStatus: 'published' });
         setMyWorks(response.data.books || []);
       } catch (error) {
         handleApiError(error);

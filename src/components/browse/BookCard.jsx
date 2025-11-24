@@ -1,7 +1,14 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import React, { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { bookApi } from '../../services/api'
+import { useAuth } from '../../services/auth/authContext'
+import { handleApiError, showSuccessToast } from '../../services/utils/errorHandler'
 
-const BookCard = ({book, linkTo}) => {
+const BookCard = ({book, linkTo, showLikeButton = false, onLikeChange}) => {
+    const { user, isAuthenticated } = useAuth();
+    const navigate = useNavigate();
+    const [localLikes, setLocalLikes] = useState(book?.likes || book?.totalLikes || book?.likesCount || 0);
+    const [isLiked, setIsLiked] = useState(book?.isLikedByUser || false);
 
 // destructure the book and map backend fields to component fields
     const {
@@ -25,7 +32,7 @@ const BookCard = ({book, linkTo}) => {
     } = book;
 
     // Handle multiple possible like field names
-    const displayLikes = likes || totalLikes || likesCount || 0;
+    const displayLikes = localLikes;
 
     // Handle author name
     const authorName = book.authorName || author?.name || 'Unknown Author';
@@ -39,11 +46,68 @@ const BookCard = ({book, linkTo}) => {
         ? tags.join(", ")
         : (tags || "No tags provided");
 
+    // Handle like/unlike
+    const handleLikeClick = async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (!isAuthenticated) {
+            showSuccessToast('Please sign in to like books');
+            navigate('/signin');
+            return;
+        }
+
+        try {
+            if (isLiked) {
+                await bookApi.unlikeBook(bookId);
+                setIsLiked(false);
+                setLocalLikes(prev => prev - 1);
+                showSuccessToast('Unliked book');
+            } else {
+                await bookApi.likeBook(bookId);
+                setIsLiked(true);
+                setLocalLikes(prev => prev + 1);
+                showSuccessToast('Liked book!');
+            }
+
+            // Notify parent component of like change
+            if (onLikeChange) {
+                onLikeChange(bookId, !isLiked);
+            }
+        } catch (error) {
+            handleApiError(error);
+        }
+    };
+
   return (
-    <Link 
-        to={destination}
-        className='flex rounded-[10px] border-solid border-2 w-full max-w-[650px] h-[220px] sm:h-[250px] md:h-[280px] bg-white overflow-hidden hover:scale-105 md:hover:scale-110 transition-all duration-300 relative'
-    >
+    <div className='group relative flex rounded-[10px] border-solid border-2 w-full max-w-[650px] h-[220px] sm:h-[250px] md:h-[280px] bg-white overflow-hidden hover:scale-105 md:hover:scale-110 transition-all duration-300'>
+
+        {/* Hover Overlay with Like/Unlike button */}
+        {showLikeButton && (
+            <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center gap-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">
+                <button
+                    onClick={handleLikeClick}
+                    className={`flex items-center gap-2 px-6 py-3 rounded-lg font-bold transition-all duration-300 ${
+                        isLiked
+                            ? 'bg-red-500 text-white hover:bg-red-600'
+                            : 'bg-white text-[#1A5632] hover:bg-[#C0FFB3]'
+                    }`}
+                >
+                    {isLiked ? '❤️ Liked' : '🤍 Like'}
+                </button>
+                <Link
+                    to={destination}
+                    className="bg-white text-black font-bold py-3 px-6 rounded-lg hover:bg-[#C0FFB3] transition-all duration-300"
+                >
+                    View Details
+                </Link>
+            </div>
+        )}
+
+        <Link
+            to={destination}
+            className='flex w-full h-full relative'
+        >
         {/* Badges - Top right corner */}
         <div className='absolute top-2 right-2 flex flex-col gap-1 z-10'>
             {isPremium && (
@@ -132,7 +196,8 @@ const BookCard = ({book, linkTo}) => {
             </div>
         </div>
 
-    </Link>
+        </Link>
+    </div>
   )
 }
 

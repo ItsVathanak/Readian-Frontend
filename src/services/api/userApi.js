@@ -73,37 +73,14 @@ const userApi = {
     return result;
   },
 
-  // Get liked books
+  // Get liked books (returns full book objects)
   getLikedBooks: async (params = {}) => {
     const response = await axiosInstance.get('/users/me/liked-books', { params });
     console.log('❤️ getLikedBooks raw response:', response.data);
 
-    // Handle response structure
-    let books = [];
-    if (response.data.data?.books) {
-      books = response.data.data.books;
-    } else if (Array.isArray(response.data.data)) {
-      books = response.data.data;
-    } else if (response.data.books) {
-      books = response.data.books;
-    }
-
-    // Transform _id to id
-    books = books.map(book => ({
-      ...book,
-      id: book._id || book.id
-    }));
-
-    const result = {
-      ...response.data,
-      data: {
-        books,
-        pagination: response.data.pagination || response.data.data?.pagination || {}
-      }
-    };
-
-    console.log('✅ getLikedBooks transformed result:', result);
-    return result;
+    // API returns full book objects
+    // Response structure: { success: true, data: { likedBooks: [...] } }
+    return response.data;
   },
 
   // Change password
