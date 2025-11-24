@@ -1,7 +1,7 @@
 # Readian Platform - Documentation Index
 
-**Version:** 1.2.0  
-**Last Updated:** November 23, 2025
+**Version:** 1.2.1  
+**Last Updated:** November 24, 2025
 
 ---
 
@@ -11,9 +11,15 @@ Welcome to the Readian Platform documentation! This comprehensive suite covers e
 
 ---
 
-## 🆕 Recent Updates (v1.2.0)
+## 🆕 Recent Updates (v1.2.1)
 
 ### New Features Documented
+- **Profile Management System**: Complete profile update functionality with name, bio, age fields
+- **Profile Image Upload**: Separate endpoint for avatar uploads with proper handling
+- **Data Validation**: Frontend validation and transformation for profile data
+- **Testing Documentation**: Comprehensive test cases for profile updates
+
+### Previous Updates (v1.2.0)
 - **Search and Filter System**: Universal search by title, tags, author, genre (all plans)
 - **Book Status Access Control**: Free/Basic see finished books, Premium gets early access to ongoing
 - **Subscription-Based Content Access**: Tiered access to ongoing vs finished books
@@ -27,10 +33,11 @@ Welcome to the Readian Platform documentation! This comprehensive suite covers e
 - **Enhanced Downloads**: Improved PDF generation without watermarks
 
 ### Updated Documentation
+- **PROFILE_UPDATE_FIX.md**: New - Technical implementation of profile management
+- **PROFILE_UPDATE_TESTING.md**: New - Comprehensive testing guide for profiles
+- **DOCUMENTATION_INDEX.md**: Added profile management documentation entries
 - **API_DOCUMENTATION.md**: Added search endpoint, book status filtering, subscription access rules
 - **FRONTEND_INTEGRATION_GUIDE.md**: Added search examples, book status badges, upgrade prompts
-- **README.md**: Updated subscription tiers with book status access matrix
-- **CHANGELOG.md**: Added v1.2.0 entry with search/filter features
 
 ---
 
@@ -243,6 +250,58 @@ Welcome to the Readian Platform documentation! This comprehensive suite covers e
 
 ---
 
+### 8. **PROFILE_UPDATE_FIX.md** - Profile Management Implementation
+**Purpose:** Technical documentation for profile update feature implementation
+
+**Contents:**
+- Problem analysis and solution
+- Updated components (EditProfileModal, ProfilePage)
+- Backend API integration details
+- Request/response formats
+- Data validation and transformation
+- Features and functionality
+- Files modified
+
+**Target Audience:** Developers, Frontend Developers
+
+**Key Sections:**
+- 📝 Form Fields (name, bio, age)
+- 🖼️ Image Upload Handling
+- ✅ Data Validation
+- 🔄 API Integration Flow
+- 📋 Testing Checklist
+
+[📄 View PROFILE_UPDATE_FIX.md](PROFILE_UPDATE_FIX.md)
+
+---
+
+### 9. **PROFILE_UPDATE_TESTING.md** - Profile Update Testing Guide
+**Purpose:** Comprehensive testing guide for profile update functionality
+
+**Contents:**
+- Test scenarios and procedures
+- Expected API requests/responses
+- Browser console verification
+- Network request validation
+- Common issues and solutions
+- Performance and accessibility checks
+
+**Target Audience:** QA Engineers, Developers, Testers
+
+**Test Scenarios:**
+- ✅ Update name only
+- ✅ Update bio only
+- ✅ Update age only
+- ✅ Update all fields
+- ✅ Upload profile image
+- ✅ Combined updates
+- ✅ Error handling
+- ✅ Validation checks
+
+[📄 View PROFILE_UPDATE_TESTING.md](PROFILE_UPDATE_TESTING.md)
+
+---
+
 ## 🎯 Quick Navigation by User Type
 
 ### For Developers
@@ -251,15 +310,18 @@ Welcome to the Readian Platform documentation! This comprehensive suite covers e
 3. Follow **FRONTEND_INTEGRATION_GUIDE.md** for integration
 4. Use **POSTMAN_TESTING_GUIDE.md** for testing
 5. Configure **.env.example** for your environment
+6. Review **PROFILE_UPDATE_FIX.md** for profile management
 
 ### For Frontend Developers
 1. **FRONTEND_INTEGRATION_GUIDE.md** - Integration patterns
 2. **API_DOCUMENTATION.md** - API endpoints
-3. **POSTMAN_TESTING_GUIDE.md** - Test your integration
+3. **PROFILE_UPDATE_FIX.md** - Profile update implementation
+4. **POSTMAN_TESTING_GUIDE.md** - Test your integration
 
 ### For QA/Testers
 1. **POSTMAN_TESTING_GUIDE.md** - Complete test scenarios
-2. **API_DOCUMENTATION.md** - Endpoint specifications
+2. **PROFILE_UPDATE_TESTING.md** - Profile update test cases
+3. **API_DOCUMENTATION.md** - Endpoint specifications
 
 ### For Users/Authors
 1. **TERMS_AND_CONDITIONS.md** - Platform rules
@@ -298,6 +360,16 @@ Complete subscription flow documentation:
 - Testing procedures
 
 **Documents:** API_DOCUMENTATION.md, FRONTEND_INTEGRATION_GUIDE.md, POSTMAN_TESTING_GUIDE.md, TERMS_AND_CONDITIONS.md
+
+### Profile Management
+Complete profile update system:
+- API endpoint for profile updates (name, bio, age)
+- Separate image upload endpoint
+- Frontend form implementation
+- Data validation and transformation
+- Testing procedures
+
+**Documents:** PROFILE_UPDATE_FIX.md, PROFILE_UPDATE_TESTING.md, API_DOCUMENTATION.md
 
 ### File Upload (Cloudinary)
 End-to-end file upload documentation:
@@ -524,14 +596,16 @@ This comprehensive documentation suite provides everything needed to:
 | TERMS_AND_CONDITIONS.md | 10+ | Users | Legal terms |
 | PRIVACY_POLICY.md | 15+ | Users/Legal | Privacy compliance |
 | .env.example | 2 | Admins | Configuration |
+| PROFILE_UPDATE_FIX.md | 5+ | Developers | Profile management |
+| PROFILE_UPDATE_TESTING.md | 8+ | QA/Testers | Profile testing |
 
-**Total:** ~160+ pages of comprehensive documentation
+**Total:** ~175+ pages of comprehensive documentation
 
 ---
 
-**Last Updated:** November 23, 2025  
-**Documentation Version:** 1.2.0  
-**Platform Version:** 1.2.0
+**Last Updated:** November 24, 2025  
+**Documentation Version:** 1.2.1  
+**Platform Version:** 1.2.1
 
 ---
 

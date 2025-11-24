@@ -11,11 +11,22 @@ function ProfilePage() {
   const { user, logout, updateUser } = useAuth();
   const navigate = useNavigate();
 
-  const handleUpdateProfile = async (updatedData) => {
+  const handleUpdateProfile = async (updatedData, profileImage) => {
     try {
       setLoading(true);
-      const response = await userApi.updateProfile(updatedData);
-      updateUser(response.data);
+
+      // Update profile data if any fields are provided
+      if (Object.keys(updatedData).length > 0) {
+        const response = await userApi.updateProfile(updatedData);
+        updateUser(response.data);
+      }
+
+      // Update profile image if provided
+      if (profileImage) {
+        const imageResponse = await userApi.updateAvatar(profileImage);
+        updateUser(imageResponse.data);
+      }
+
       showSuccessToast('Profile updated successfully!');
       setIsEditing(false);
     } catch (error) {

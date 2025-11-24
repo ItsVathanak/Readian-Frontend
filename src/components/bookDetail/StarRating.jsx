@@ -36,16 +36,34 @@ const StarRating = ({ bookId, averageRating = 0, totalRatings = 0 }) => {
       return;
     }
 
+    if (!bookId) {
+      handleApiError({ message: 'Book ID is required' });
+      return;
+    }
+
     try {
       setLoading(true);
-      await ratingApi.rateBook(bookId, { rating: value });
+
+      // Prepare the rating payload
+      const payload = { rating: value };
+      console.log('📊 Submitting rating:', payload); // Debug log
+
+      const response = await ratingApi.rateBook(bookId, payload);
+      console.log('✅ Rating response:', response); // Debug log
+
       setUserRating(value);
       setRating(value);
       showSuccessToast('Rating submitted successfully!');
-      // Optionally refresh the page to show updated average
-      window.location.reload();
+
+      // Reload the page after a short delay to show the updated average
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
     } catch (error) {
+      console.error('❌ Rating error:', error); // Debug log
       handleApiError(error);
+      // Reset the rating on error
+      setRating(userRating || 0);
     } finally {
       setLoading(false);
     }

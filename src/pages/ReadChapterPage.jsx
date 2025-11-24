@@ -68,25 +68,21 @@ function ReadChapterPage() {
     <AgeGuard contentType={book.contentType} bookTitle={book.title}>
       <SubscriptionGuard book={book}>
         <div className='bg-gradient-to-b from-[#C0FFB3] via-white to-[#FFFDEE] min-h-screen'>
-          <div className='flex'>
-            {/* Main Content */}
-            <div className='flex-1 lg:pr-80'>
-              <div className='max-w-4xl mx-auto px-4 py-8'>
-                <ChapterContent
-                  chapter={chapter}
-                  bookId={bookId}
-                  book={book}
-                  prevChapter={prevChapter}
-                  nextChapter={nextChapter}
-                />
-              </div>
-            </div>
+          {/* Chapter Navigation Bar */}
+          <ChapterNavigation
+            bookId={bookId}
+            currentChapter={chapter}
+            allChapters={allChapters}
+            prevChapter={prevChapter}
+            nextChapter={nextChapter}
+          />
 
-            {/* Sidebar Navigation */}
-            <ChapterNavigation
+          {/* Main Content */}
+          <div className='max-w-4xl mx-auto px-4 py-8'>
+            <ChapterContent
+              chapter={chapter}
               bookId={bookId}
-              currentChapter={chapter}
-              allChapters={allChapters}
+              book={book}
               prevChapter={prevChapter}
               nextChapter={nextChapter}
             />

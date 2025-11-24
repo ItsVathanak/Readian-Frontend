@@ -182,27 +182,27 @@ const BrowseSidebar = ({title,setTitle,author,setAuthor,status,setStatus,tags,se
             <label>Tags:</label>
             <input
               type="text"
-              placeholder='fantasy,sci-fi,romance'
+              placeholder='fantasy, sci-fi, romance'
               value={tags}
               onChange={(e) => setTags(e.target.value)}
               className='bg-white rounded-[10px] p-2 w-full'
             />
-            <small className='text-gray-500 text-xs'>Separate tags with a comma</small>
+            <small className='text-gray-500 text-xs block mt-1'>Separate tags with commas</small>
         </div>
 
         {/* Likes */}
-        <div>
+        <div className='w-full'>
             <label>
-                Likes more than: {minLikes}{minLikes>=1000 ? "+":""}
+                Likes more than: {minLikes}
             </label>
 
             <input 
             type="range"
             min={0}
-            max={1000}
-            step={50}
+            max={3}
+            step={1}
             value={minLikes}
-            onChange={(e) => setMinLikes(e.target.value)}
+            onChange={(e) => setMinLikes(Number(e.target.value))}
             className='w-full appearance-none h-[2px] bg-black/40 rounded slider-thumb'
             />
         </div>

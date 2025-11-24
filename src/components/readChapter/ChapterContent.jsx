@@ -46,16 +46,6 @@ const ChapterContent = ({chapter,bookId,book,prevChapter,nextChapter}) => {
                     Author: {book.author?.name || "No Author"}
                 </p>
             </div>
-            <br />
-            {/* Buttons */}
-            <div className='flex justify-evenly w-full'>
-                <Link 
-                    to={`/book/${book.id}`}
-                    className='content-center py-[5px] px-[50px] bg-white text-[#1A5632] rounded-[30px] hover:bg-[#1A5632] hover:text-white transition-all duration-300'
-                >
-                    Back to book
-                </Link>
-            </div>
         </div>
 
         {/* Chapter content */}

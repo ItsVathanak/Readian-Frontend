@@ -20,13 +20,7 @@ const BrowsePage = () => {
     const initialTag = searchParams.get('tag') || '';
     const searchQuery = searchParams.get('search') || '';
 
-    //state for all filters - input values (immediate, what user types)
-    const [titleInput, setTitleInput] = useState(searchQuery);
-    const [authorInput, setAuthorInput] = useState('');
-    const [genreInput, setGenreInput] = useState('');
-    const [tagsInput, setTagsInput] = useState(initialTag);
-
-    // Debounced filter values (used for actual API search)
+    //state for all filters - used directly for filtering
     const [title, setTitle] = useState(searchQuery);
     const [author, setAuthor] = useState('');
     const [status, setStatus] = useState('All');
@@ -34,11 +28,13 @@ const BrowsePage = () => {
     const [genre, setGenre] = useState('');
     const [minLikes, setMinLikes] = useState(0);
 
-    // Update title when search query changes
+    // Debounce timer ref
+    const debounceTimerRef = useRef(null);
+
+    // Update title when search query changes from URL
     useEffect(() => {
         const newSearchQuery = searchParams.get('search') || '';
         if (newSearchQuery) {
-            setTitleInput(newSearchQuery);
             setTitle(newSearchQuery);
         }
     }, [searchParams]);
@@ -47,17 +43,49 @@ const BrowsePage = () => {
     useEffect(() => {
         const newTag = searchParams.get('tag') || '';
         if (newTag) {
-            setTagsInput(newTag);
             setTags(newTag);
         }
     }, [searchParams]);
 
-    // Manual search trigger - called when user presses Enter
-    const handleSearch = () => {
-        setTitle(titleInput);
-        setAuthor(authorInput);
-        setGenre(genreInput);
-        setTags(tagsInput);
+    // Debounced filter handlers
+    const handleTitleChange = (value) => {
+        setTitle(value);
+        if (debounceTimerRef.current) {
+            clearTimeout(debounceTimerRef.current);
+        }
+        debounceTimerRef.current = setTimeout(() => {
+            // Debounced value will trigger fetchBooks via useEffect
+        }, 800);
+    };
+
+    const handleAuthorChange = (value) => {
+        setAuthor(value);
+        if (debounceTimerRef.current) {
+            clearTimeout(debounceTimerRef.current);
+        }
+        debounceTimerRef.current = setTimeout(() => {
+            // Debounced value will trigger fetchBooks via useEffect
+        }, 800);
+    };
+
+    const handleGenreChange = (value) => {
+        setGenre(value);
+        if (debounceTimerRef.current) {
+            clearTimeout(debounceTimerRef.current);
+        }
+        debounceTimerRef.current = setTimeout(() => {
+            // Debounced value will trigger fetchBooks via useEffect
+        }, 800);
+    };
+
+    const handleTagsChange = (value) => {
+        setTags(value);
+        if (debounceTimerRef.current) {
+            clearTimeout(debounceTimerRef.current);
+        }
+        debounceTimerRef.current = setTimeout(() => {
+            // Debounced value will trigger fetchBooks via useEffect
+        }, 800);
     };
 
     // Observer for infinite scroll
@@ -170,16 +198,16 @@ const BrowsePage = () => {
         <div className='bg-[#FFFDEE] min-h-screen'>
             <div className='flex flex-col lg:flex-row relative'>
                 <BrowseSidebar
-                    title={titleInput}
-                    setTitle={setTitleInput}
-                    author={authorInput}
-                    setAuthor={setAuthorInput}
+                    title={title}
+                    setTitle={handleTitleChange}
+                    author={author}
+                    setAuthor={handleAuthorChange}
                     status={status}
                     setStatus={setStatus}
-                    tags={tagsInput}
-                    setTags={setTagsInput}
-                    genre={genreInput}
-                    setGenre={setGenreInput}
+                    tags={tags}
+                    setTags={handleTagsChange}
+                    genre={genre}
+                    setGenre={handleGenreChange}
                     minLikes={minLikes}
                     setMinLikes={setMinLikes}
                 />

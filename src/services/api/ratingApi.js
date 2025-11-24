@@ -3,7 +3,18 @@ import axiosInstance from './axiosConfig';
 const ratingApi = {
   // Rate a book
   rateBook: async (bookId, ratingData) => {
-    const response = await axiosInstance.post(`/books/${bookId}/rate`, ratingData);
+    console.log('🔍 ratingApi.rateBook called with:', { bookId, ratingData });
+    console.log('🔍 Type of ratingData:', typeof ratingData);
+    console.log('🔍 ratingData keys:', Object.keys(ratingData));
+
+    // Ensure the data is properly formatted
+    const payload = {
+      rating: ratingData.rating
+    };
+
+    console.log('🔍 Final payload being sent:', JSON.stringify(payload));
+
+    const response = await axiosInstance.post(`/books/${bookId}/rate`, payload);
     return response.data;
   },
 

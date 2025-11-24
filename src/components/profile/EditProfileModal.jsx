@@ -2,23 +2,20 @@ import React, { useState, useEffect } from 'react';
 
 function EditProfileModal({ currentUser, onClose, onSave }) {
   // --- Form State (initialized with current user data) ---
-  const [username, setUsername] = useState(currentUser.username || '');
-  const [email, setEmail] = useState(currentUser.email || '');
-  const [dob, setDob] = useState(currentUser.dob || '');
-  const [aboutMe, setAboutMe] = useState(currentUser.aboutMe || '');
-  const [profileImage, setProfileImage] = useState(currentUser.profileImage || null); // Can be URL or File object
+  const [name, setName] = useState(currentUser.name || '');
+  const [bio, setBio] = useState(currentUser.bio || '');
+  const [age, setAge] = useState(currentUser.age || '');
+  const [profileImage, setProfileImage] = useState(null); // File object for upload
 
   // For password, you usually don't pre-fill it for security
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  // Handle image upload (very basic for now)
+  // Handle image upload
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // For mock data, we can convert it to a URL
-      setProfileImage(URL.createObjectURL(file)); 
-      // In a real app, you'd upload this file to a server
+      setProfileImage(file); // Store the file object for upload
     }
   };
 
@@ -30,16 +27,15 @@ function EditProfileModal({ currentUser, onClose, onSave }) {
       return;
     }
 
-    const updatedData = {
-      username,
-      email,
-      dob,
-      aboutMe,
-      profileImage, // This could be a new URL or base64 string
-      // Only include password if it was changed
-      ...(password && { password }) 
-    };
-    onSave(updatedData); // Send data to parent to handle actual saving
+    // Prepare data according to backend API format
+    const updatedData = {};
+
+    // Only include fields that have values
+    if (name.trim()) updatedData.name = name.trim();
+    if (bio.trim()) updatedData.bio = bio.trim();
+    if (age && !isNaN(age)) updatedData.age = parseInt(age);
+
+    onSave(updatedData, profileImage); // Send data and image separately
   };
 
   return (
@@ -61,7 +57,9 @@ function EditProfileModal({ currentUser, onClose, onSave }) {
           <div className="flex flex-col items-center mb-6">
             <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden mb-2">
               {profileImage ? (
-                <img src={profileImage} alt="Profile" className="w-full h-full object-cover" />
+                <img src={URL.createObjectURL(profileImage)} alt="Profile" className="w-full h-full object-cover" />
+              ) : currentUser.profileImage ? (
+                <img src={currentUser.profileImage} alt="Profile" className="w-full h-full object-cover" />
               ) : (
                 <span className="text-gray-500 text-xs text-center">Upload Photo</span>
               )}
@@ -79,40 +77,30 @@ function EditProfileModal({ currentUser, onClose, onSave }) {
             >
               Upload Photo
             </label>
-            <p className="text-sm text-gray-600 mt-2">Joined: {currentUser.joinedDate}</p>
+            <p className="text-sm text-gray-600 mt-2">Joined: {new Date(currentUser.createdAt).toLocaleDateString()}</p>
           </div>
 
           {/* Form Fields */}
           <div className="space-y-4">
             <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700">Username:</label>
-              <input type="text" id="username" value={username} onChange={(e) => setUsername(e.target.value)}
-                className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm" />
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700">Name:</label>
+              <input type="text" id="name" value={name} onChange={(e) => setName(e.target.value)}
+                className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm"
+                placeholder="Enter your name" />
             </div>
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email:</label>
-              <input type="email" id="email" value={email} onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm" />
+              <label htmlFor="age" className="block text-sm font-medium text-gray-700">Age:</label>
+              <input type="number" id="age" value={age} onChange={(e) => setAge(e.target.value)}
+                className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm"
+                placeholder="Enter your age"
+                min="1"
+                max="150" />
             </div>
             <div>
-              <label htmlFor="dob" className="block text-sm font-medium text-gray-700">Date of Birth:</label>
-              <input type="text" id="dob" value={dob} onChange={(e) => setDob(e.target.value)} // Changed to text for easy mock date format
-                className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm" />
-            </div>
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">New Password (optional):</label>
-              <input type="password" id="password" value={password} onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm" />
-            </div>
-            <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">Confirm Password:</label>
-              <input type="password" id="confirmPassword" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)}
-                className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm" />
-            </div>
-            <div>
-              <label htmlFor="aboutMe" className="block text-sm font-medium text-gray-700">About Me:</label>
-              <textarea id="aboutMe" value={aboutMe} onChange={(e) => setAboutMe(e.target.value)}
-                className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm h-24 resize-none" />
+              <label htmlFor="bio" className="block text-sm font-medium text-gray-700">Bio:</label>
+              <textarea id="bio" value={bio} onChange={(e) => setBio(e.target.value)}
+                className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm h-24 resize-none"
+                placeholder="Tell us about yourself..." />
             </div>
           </div>
 
