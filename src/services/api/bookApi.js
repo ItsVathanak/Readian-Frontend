@@ -38,6 +38,12 @@ const bookApi = {
     return response.data;
   },
 
+  // Publish book (Author/Admin only)
+  publishBook: async (bookId) => {
+    const response = await axiosInstance.post(`/books/${bookId}/publish`);
+    return response.data;
+  },
+
   // Upload book cover
   uploadBookCover: async (bookId, file) => {
     const formData = createFormData({ coverImage: file });

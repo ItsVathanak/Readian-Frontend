@@ -87,15 +87,26 @@ const BookEditPage = () => {
     // --- Form Handlers ---
     const saveBookData = async () => {
         try {
+            // Prepare book data according to API specification
             const bookData = {
                 title,
                 description,
-                status,
-                tags,
-                genre,
-                premiumStatus,
-                ageRestriction: ageRestriction || undefined,
+                bookStatus: status, // API expects 'bookStatus' not 'status'
+                tags: Array.isArray(tags) ? tags.join(', ') : tags, // Convert array to comma-separated string
+                genre: Array.isArray(genre) ? genre.join(', ') : genre, // Convert array to comma-separated string
+                isPremium: premiumStatus === 'premium' || premiumStatus === true,
+                contentType: ageRestriction === '18+' ? 'adult' : 'kids',
             };
+
+            // For new books, include chapters as JSON string (required by API)
+            if (isNew && chapters.length > 0) {
+                bookData.chapters = JSON.stringify(chapters);
+            }
+
+            // For updates, include chapters if they exist
+            if (!isNew && chapters.length > 0) {
+                bookData.chapters = JSON.stringify(chapters);
+            }
 
             if (isNew) {
                 const response = await bookApi.createBook(bookData);
@@ -104,8 +115,11 @@ const BookEditPage = () => {
                 const newBookId = response.data._id || response.data.id;
                 navigate(`/edit/${newBookId}`, { replace: true });
             } else {
-                await bookApi.updateBook(bookToEdit.id || bookToEdit._id, bookData);
+                const bookId = bookToEdit.id || bookToEdit._id;
+                await bookApi.updateBook(bookId, bookData);
                 showSuccessToast('Book updated successfully!');
+                // Refresh book data
+                window.location.reload();
             }
         } catch (error) {
             handleApiError(error);
@@ -129,11 +143,29 @@ const BookEditPage = () => {
 
     const handleNewChapter = () => {
         if (isNew) {
-            showSuccessToast("Please save the book first before adding chapters.");
-            return;
+            // For new books, add a blank chapter to the local state
+            const newChapter = {
+                id: `temp-${Date.now()}`,
+                title: `Chapter ${chapters.length + 1}`,
+                content: ''
+            };
+            setChapters([...chapters, newChapter]);
+            showSuccessToast("Chapter added! Fill in the details below.");
+        } else {
+            const bookId = bookToEdit.id || bookToEdit._id;
+            navigate(`/edit/${bookId}/chapter/new`);
         }
-        const bookId = bookToEdit.id || bookToEdit._id;
-        navigate(`/edit/${bookId}/chapter/new`);
+    };
+
+    const handleUpdateChapter = (chapterId, field, value) => {
+        setChapters(chapters.map(ch =>
+            ch.id === chapterId ? { ...ch, [field]: value } : ch
+        ));
+    };
+
+    const handleDeleteChapter = (chapterId) => {
+        setChapters(chapters.filter(ch => ch.id !== chapterId));
+        showSuccessToast("Chapter removed");
     };
 
     const handleDeleteWork = async () => {
@@ -153,15 +185,23 @@ const BookEditPage = () => {
         if (!isNew) {
             try {
                 const bookId = bookToEdit.id || bookToEdit._id;
-                const newPubStatus = bookToEdit.pubStatus === 'draft' ? 'published' : 'draft';
-                await bookApi.updateBook(bookId, { pubStatus: newPubStatus });
-                showSuccessToast(`Book ${newPubStatus === 'published' ? 'published' : 'unpublished'} successfully!`);
+                const currentStatus = bookToEdit.pubStatus;
+
+                if (currentStatus === 'draft') {
+                    // Use dedicated publish endpoint
+                    await bookApi.publishBook(bookId);
+                    showSuccessToast('Book published successfully!');
+                } else {
+                    // For unpublishing, use update endpoint
+                    await bookApi.updateBook(bookId, { pubStatus: 'draft' });
+                    showSuccessToast('Book unpublished successfully!');
+                }
                 navigate(dashboardPath);
             } catch (error) {
                 handleApiError(error);
             }
         } else {
-            await saveBookData();
+            showSuccessToast('Please save the book first before publishing.');
         }
     };
 
@@ -202,10 +242,12 @@ const BookEditPage = () => {
                 />
 
                 <BookEditChapters 
-                    
                     chapters={chapters}
                     onEditChapter={handleEditChapterClick}
                     onNewChapter={handleNewChapter}
+                    isNewBook={isNew}
+                    onUpdateChapter={handleUpdateChapter}
+                    onDeleteChapter={handleDeleteChapter}
                 />
             </main>
         </div>
