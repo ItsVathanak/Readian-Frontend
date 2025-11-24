@@ -35,7 +35,7 @@ function MyWorks() {
 
   return (
     <div className='flex flex-col w-full'>
-      <h1 className="geist text-[48px] font-semibold mb-6 self-start ">
+      <h1 className="geist text-[48px] font-semibold mb-6 self-start">
         My <span className='text-[#00A819]'>Works</span>
       </h1>
 
@@ -46,7 +46,10 @@ function MyWorks() {
             return <BookCard key={bookId} book={book} linkTo={`/edit/${bookId}`}/>
           })
         ) : (
-          <p className="text-lg text-gray-600">You haven't published any works yet.</p>
+          <div className="col-span-full text-center py-12">
+            <p className="text-lg text-gray-600 mb-4">You haven't published any works yet.</p>
+            <p className="text-gray-500">Go to "My Drafts" to create a new book!</p>
+          </div>
         )}
       </div>
     </div>

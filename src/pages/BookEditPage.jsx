@@ -100,9 +100,11 @@ const BookEditPage = () => {
             if (isNew) {
                 const response = await bookApi.createBook(bookData);
                 showSuccessToast('Book created successfully!');
-                navigate(`/edit/${response.data.id}`, { replace: true });
+                // Backend returns _id in the response
+                const newBookId = response.data._id || response.data.id;
+                navigate(`/edit/${newBookId}`, { replace: true });
             } else {
-                await bookApi.updateBook(bookToEdit.id, bookData);
+                await bookApi.updateBook(bookToEdit.id || bookToEdit._id, bookData);
                 showSuccessToast('Book updated successfully!');
             }
         } catch (error) {
@@ -118,7 +120,8 @@ const BookEditPage = () => {
     const handleEditChapterClick = async (chapterId) => {
         await saveBookData();
         if (!isNew) {
-            navigate(`/edit/${bookToEdit.id}/chapter/${chapterId}`);
+            const bookId = bookToEdit.id || bookToEdit._id;
+            navigate(`/edit/${bookId}/chapter/${chapterId}`);
         } else {
             showSuccessToast("Save your new book first before adding chapters.");
         }
@@ -129,13 +132,15 @@ const BookEditPage = () => {
             showSuccessToast("Please save the book first before adding chapters.");
             return;
         }
-        navigate(`/edit/${bookToEdit.id}/chapter/new`);
+        const bookId = bookToEdit.id || bookToEdit._id;
+        navigate(`/edit/${bookId}/chapter/new`);
     };
 
     const handleDeleteWork = async () => {
         if (window.confirm("Are you sure you want to permanently delete this work?")) {
             try {
-                await bookApi.deleteBook(bookToEdit.id);
+                const bookId = bookToEdit.id || bookToEdit._id;
+                await bookApi.deleteBook(bookId);
                 showSuccessToast('Book deleted successfully!');
                 navigate(dashboardPath);
             } catch (error) {
@@ -147,8 +152,9 @@ const BookEditPage = () => {
     const handlePublishWork = async () => {
         if (!isNew) {
             try {
+                const bookId = bookToEdit.id || bookToEdit._id;
                 const newPubStatus = bookToEdit.pubStatus === 'draft' ? 'published' : 'draft';
-                await bookApi.updateBook(bookToEdit.id, { pubStatus: newPubStatus });
+                await bookApi.updateBook(bookId, { pubStatus: newPubStatus });
                 showSuccessToast(`Book ${newPubStatus === 'published' ? 'published' : 'unpublished'} successfully!`);
                 navigate(dashboardPath);
             } catch (error) {

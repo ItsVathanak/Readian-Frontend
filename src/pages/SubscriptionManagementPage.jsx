@@ -39,22 +39,6 @@ const SubscriptionManagementPage = () => {
     return days > 0 ? days : 0;
   };
 
-  const handleCancelSubscription = async () => {
-    if (!window.confirm('Are you sure you want to cancel your subscription?')) {
-      return;
-    }
-
-    try {
-      setLoading(true);
-      await subscriptionApi.cancelSubscription();
-      showSuccessToast('Subscription cancelled successfully');
-      updateUser({ subscriptionStatus: 'cancelled' });
-    } catch (error) {
-      handleApiError(error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleUpgrade = (plan) => {
     navigate(`/subscribe?plan=${plan}`);
@@ -174,16 +158,6 @@ const SubscriptionManagementPage = () => {
                 className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
               >
                 Upgrade to Premium
-              </button>
-            )}
-
-            {currentPlan !== 'free' && isActive && (
-              <button
-                onClick={handleCancelSubscription}
-                disabled={loading}
-                className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
-              >
-                {loading ? 'Cancelling...' : 'Cancel Subscription'}
               </button>
             )}
           </div>

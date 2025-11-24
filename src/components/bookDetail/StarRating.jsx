@@ -55,10 +55,7 @@ const StarRating = ({ bookId, averageRating = 0, totalRatings = 0 }) => {
       setRating(value);
       showSuccessToast('Rating submitted successfully!');
 
-      // Reload the page after a short delay to show the updated average
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000);
+      // No page reload - rating updates in place
     } catch (error) {
       console.error('❌ Rating error:', error); // Debug log
       handleApiError(error);
