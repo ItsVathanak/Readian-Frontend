@@ -66,18 +66,10 @@ const BookDetail = ({book,signedIn,currentUser}) => {
 
     try {
       // Send rating in correct format: { rating: value }
-      const response = await ratingApi.rateBook(book._id, { rating: rating });
+      await ratingApi.rateBook(book._id, { rating: rating });
       setUserRating(rating);
       showSuccessToast(`Rated ${rating} stars!`);
-
-      // Update the book's average rating if returned from API
-      if (response.data?.averageRating !== undefined) {
-        setBook(prev => ({
-          ...prev,
-          averageRating: response.data.averageRating,
-          totalRatings: response.data.totalRatings || prev.totalRatings
-        }));
-      }
+      // Note: Average rating will update on next page load
     } catch (error) {
       handleApiError(error);
     }
