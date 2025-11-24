@@ -8,6 +8,7 @@ import { handleApiError, showSuccessToast } from '../services/utils/errorHandler
 function ProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const { user, logout, updateUser } = useAuth();
   const navigate = useNavigate();
 
@@ -41,6 +42,43 @@ function ProfilePage() {
     navigate('/signin');
   };
 
+  const handleImageUpload = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/HEIC'];
+    if (!allowedTypes.includes(file.type)) {
+      handleApiError({ message: 'Please upload a valid image file (JPEG, PNG, HEIC or WebP)' });
+      return;
+    }
+
+    // Validate file size (e.g., max 5MB)
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+      handleApiError({ message: 'Image size must be less than 5MB' });
+      return;
+    }
+
+    try {
+      setUploadingImage(true);
+      const formData = new FormData();
+      formData.append('avatar', file);
+
+      const response = await userApi.updateAvatar(formData);
+      updateUser(response.data);
+      showSuccessToast('Profile image updated successfully!');
+    } catch (error) {
+      handleApiError(error);
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
+  const handleSidebarNavigation = (path) => {
+    navigate(path);
+  };
+
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -65,7 +103,30 @@ function ProfilePage() {
       <aside className="w-full lg:w-[280px] xl:w-[320px] bg-[#C0FFB3] flex flex-col py-8 lg:py-[50px] gap-6 lg:gap-[30px] min-h-fit lg:min-h-svh">
         <h1 className="geist text-[28px] sm:text-[32px] lg:text-[36px] font-semibold text-center">Settings</h1>
         <div className="bg-white p-3 sm:p-4 w-full">
-          <p className="text-[20px] sm:text-[24px] font-bold text-center">My Account</p>
+          <p
+            onClick={() => handleSidebarNavigation('/profile')}
+            className="text-[20px] sm:text-[24px] font-bold text-center cursor-pointer hover:bg-gray-100 py-2 rounded transition-colors"
+          >
+            My Account
+          </p>
+          <p
+            onClick={() => handleSidebarNavigation('/become-author')}
+            className="text-[20px] sm:text-[24px] font-bold text-center cursor-pointer hover:bg-gray-100 py-2 rounded transition-colors"
+          >
+            Become author
+          </p>
+          <p
+            onClick={() => handleSidebarNavigation('/subscription/manage')}
+            className="text-[20px] sm:text-[24px] font-bold text-center cursor-pointer hover:bg-gray-100 py-2 rounded transition-colors"
+          >
+            Manage Subscription
+          </p>
+          <p
+            onClick={() => handleSidebarNavigation('/downloads')}
+            className="text-[20px] sm:text-[24px] font-bold text-center cursor-pointer hover:bg-gray-100 py-2 rounded transition-colors"
+          >
+            Downloads history
+          </p>
         </div>
       </aside>
 
@@ -76,13 +137,32 @@ function ProfilePage() {
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 sm:gap-8 lg:gap-12">
           {/* Profile Image Section */}
           <div className="flex flex-col items-center self-start">
-            <div className="w-24 h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden mb-2">
+            <div className="w-24 h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden mb-2 relative">
               {user.profileImage ? (
                 <img src={user.profileImage} alt="Profile" className="w-full h-full object-cover" />
               ) : (
                 <span className="text-gray-500 text-xs text-center">No Photo</span>
               )}
+              {uploadingImage && (
+                <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+                </div>
+              )}
             </div>
+            <label
+              htmlFor="profile-image-upload"
+              className="px-3 py-1 text-xs sm:text-sm bg-gray-200 rounded-lg font-semibold hover:bg-gray-300 cursor-pointer transition-all mb-2 disabled:opacity-50"
+            >
+              {uploadingImage ? 'Uploading...' : 'Change Photo'}
+            </label>
+            <input
+              id="profile-image-upload"
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              onChange={handleImageUpload}
+              disabled={uploadingImage}
+              className="hidden"
+            />
             <p className="text-xs sm:text-sm text-gray-600">Joined: {formatDate(user.createdAt)}</p>
           </div>
 
@@ -100,15 +180,6 @@ function ProfilePage() {
             <p className="font-semibold">Role:</p>
             <p className="capitalize">{user.role}</p>
 
-            <p className="font-semibold">Subscription Status:</p>
-            <p className="capitalize">{user.subscriptionStatus || 'inactive'}</p>
-
-            {user.subscriptionStatus === 'active' && (
-              <>
-                <p className='font-semibold'>Subscription Expires:</p>
-                <p>{formatDate(user.subscriptionEndDate)}</p>
-              </>
-            )}
             
             <p className="font-semibold col-span-2">Bio:</p>
             <div

@@ -11,7 +11,7 @@ function SignUpPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [role, setRole] = useState('reader');
+  const [role, setRole] = useState('READER');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { register } = useAuth();
@@ -127,20 +127,6 @@ function SignUpPage() {
               className="w-full p-3 border rounded-lg bg-white"
               required
             />
-          </div>
-
-          {/* Role Selection */}
-          <div>
-            <label className="block mb-1 font-semibold">I want to register as:</label>
-            <select
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              className="w-full p-3 border rounded-lg bg-white"
-              required
-            >
-              <option value="reader">Reader</option>
-              <option value="author">Author</option>
-            </select>
           </div>
           
           {/* Password */}
