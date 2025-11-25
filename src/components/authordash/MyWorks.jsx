@@ -14,7 +14,11 @@ function MyWorks() {
       try {
         setLoading(true);
         const response = await userApi.getMyBooks({ pubStatus: 'published' });
-        setMyWorks(response.data.books || []);
+        // Filter to ensure only published books are shown
+        const publishedBooks = (response.data.books || []).filter(book =>
+          book.status === 'published' || book.pubStatus === 'published'
+        );
+        setMyWorks(publishedBooks);
       } catch (error) {
         handleApiError(error);
       } finally {

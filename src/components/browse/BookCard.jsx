@@ -4,7 +4,7 @@ import { bookApi } from '../../services/api'
 import { useAuth } from '../../services/auth/authContext'
 import { handleApiError, showSuccessToast } from '../../services/utils/errorHandler'
 
-const BookCard = ({book, linkTo, showLikeButton = false, onLikeChange}) => {
+const BookCard = ({book, linkTo, showLikeButton = false, onLikeChange, disableHoverScale = false}) => {
     const { user, isAuthenticated } = useAuth();
     const navigate = useNavigate();
     const [localLikes, setLocalLikes] = useState(book?.likes || book?.totalLikes || book?.likesCount || 0);

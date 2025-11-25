@@ -1,49 +1,37 @@
 import axiosInstance from './axiosConfig';
-import { createFormData } from '../utils/apiHelpers';
 
 const chapterApi = {
-  // Get chapter by ID
-  getChapterById: async (chapterId) => {
-    const response = await axiosInstance.get(`/books/${bookId}/chapters/${chapterId}`);
-    return response.data;
-  },
-
   // Create a new chapter (Author only)
   createChapter: async (bookId, chapterData) => {
-    const formData = createFormData(chapterData);
-    const response = await axiosInstance.post(`/books/${bookId}/chapters`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
+    const payload = {
+      title: chapterData.title,
+      content: chapterData.content
+    };
+
+    const response = await axiosInstance.post(`/books/${bookId}/chapters`, payload);
     return response.data;
   },
 
-  // Update chapter (Author only)
-  updateChapter: async (chapterId, chapterData) => {
-    const formData = createFormData(chapterData);
-    const response = await axiosInstance.put(`/books/${bookId}/chapters/${chapterId}`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
+  // Update chapter (Author only) - Using PATCH
+  updateChapter: async (bookId, chapterNumber, chapterData) => {
+    const payload = {
+      title: chapterData.title,
+      content: chapterData.content
+    };
+
+    const response = await axiosInstance.patch(`/books/${bookId}/chapters/${chapterNumber}`, payload);
     return response.data;
   },
 
   // Delete chapter (Author only)
-  deleteChapter: async (chapterId) => {
-    const response = await axiosInstance.delete(`/books/${bookId}/chapters/${chapterId}`);
+  deleteChapter: async (bookId, chapterNumber) => {
+    const response = await axiosInstance.delete(`/books/${bookId}/chapters/${chapterNumber}`);
     return response.data;
   },
 
-  // Upload chapter PDF
-  uploadChapterPDF: async (chapterId, file) => {
-    const formData = createFormData({ pdf: file });
-    const response = await axiosInstance.post(`/books/${bookId}/chapters/${chapterId}/pdf`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
-    return response.data;
-  },
-
-  // Get chapter content (for reading)
-  getChapterContent: async (chapterId) => {
-    const response = await axiosInstance.get(`/books/chapters/${chapterId}/content`);
+  // Get chapter by number
+  getChapter: async (bookId, chapterNumber) => {
+    const response = await axiosInstance.get(`/books/${bookId}/chapters/${chapterNumber}`);
     return response.data;
   },
 
@@ -54,9 +42,9 @@ const chapterApi = {
   },
 
   // Reorder chapters (Author only)
-  reorderChapters: async (bookId, chapterOrders) => {
-    const response = await axiosInstance.put(`/books/${bookId}/chapters/reorder`, {
-      orders: chapterOrders,
+  reorderChapters: async (bookId, chapterOrder) => {
+    const response = await axiosInstance.patch(`/books/${bookId}/chapters/reorder`, {
+      chapterOrder: chapterOrder
     });
     return response.data;
   },

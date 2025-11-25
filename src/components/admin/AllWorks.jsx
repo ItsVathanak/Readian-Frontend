@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import AllWorksCard from './AllWorksCard';
+import BookCard from '../browse/BookCard';
 import RemoveBookPopup from './RemoveBookPopup';
 import BookRemovalCompletePopup from './BookRemovalCompletePopup';
 import { adminApi } from '../../services/api';
@@ -137,13 +137,27 @@ function AllWorks() {
       {/* Grid of All Works */}
       <div className="grid grid-cols-1 2xl:grid-cols-2 gap-6 2xl:gap-2 w-full place-items-center">
         {filteredBooks.length > 0 ? (
-          filteredBooks.map(book => 
-            <AllWorksCard 
-              key={book.id} 
-              book={book} 
-              onRemove={() => handleRemoveClick(book)} 
-            />
-          )
+          filteredBooks.map(book => {
+            const bookId = book.id || book._id;
+            return (
+              <div key={bookId} className="relative w-full max-w-[650px] admin-book-card group">
+                <BookCard book={book} linkTo={`/book/${bookId}`} disableHoverScale={true} />
+                {/* Admin Remove Button Overlay */}
+                <div className="absolute inset-0 bg-black/80 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-[10px]" style={{ zIndex: 50 }}>
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleRemoveClick(book);
+                    }}
+                    className="bg-red-500 text-white font-bold py-3 px-8 rounded-lg hover:bg-red-600 transition-all duration-300 shadow-lg"
+                  >
+                    Remove Book
+                  </button>
+                </div>
+              </div>
+            );
+          })
         ) : (
           <p>No books match your criteria.</p>
         )}

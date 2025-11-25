@@ -14,7 +14,11 @@ const MyDrafts = () => {
         try {
           setLoading(true);
           const response = await userApi.getMyBooks({ pubStatus: 'draft' });
-          setMyDrafts(response.data.books || []);
+          // Filter to ensure only draft books are shown
+          const draftBooks = (response.data.books || []).filter(book =>
+            book.status === 'draft' || book.pubStatus === 'draft'
+          );
+          setMyDrafts(draftBooks);
         } catch (error) {
           handleApiError(error);
         } finally {

@@ -1,5 +1,4 @@
 import axiosInstance from './axiosConfig';
-import { createFormData } from '../utils/apiHelpers';
 
 const bookApi = {
   // Get all books with filters
@@ -16,19 +15,38 @@ const bookApi = {
 
   // Create a new book (Author only)
   createBook: async (bookData) => {
-    const formData = createFormData(bookData);
-    const response = await axiosInstance.post('/books', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
+    const payload = {
+      title: bookData.title,
+      description: bookData.description || '',
+      tags: bookData.tags || '',
+      genre: bookData.genre || '',
+      isPremium: bookData.isPremium || false,
+      status: bookData.status || 'draft',
+      image: bookData.image || '',
+      contentType: bookData.contentType || 'kids',
+      bookStatus: bookData.bookStatus || 'ongoing',
+      chapters: bookData.chapters || []
+    };
+
+    const response = await axiosInstance.post('/books', payload);
     return response.data;
   },
 
-  // Update book (Author only)
+  // Update book (Author only) - Using PATCH
   updateBook: async (bookId, bookData) => {
-    const formData = createFormData(bookData);
-    const response = await axiosInstance.put(`/books/${bookId}`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
+    const payload = {};
+
+    if (bookData.title !== undefined) payload.title = bookData.title;
+    if (bookData.description !== undefined) payload.description = bookData.description;
+    if (bookData.tags !== undefined) payload.tags = bookData.tags;
+    if (bookData.genre !== undefined) payload.genre = bookData.genre;
+    if (bookData.isPremium !== undefined) payload.isPremium = bookData.isPremium;
+    if (bookData.status !== undefined) payload.status = bookData.status;
+    if (bookData.contentType !== undefined) payload.contentType = bookData.contentType;
+    if (bookData.bookStatus !== undefined) payload.bookStatus = bookData.bookStatus;
+    if (bookData.image !== undefined) payload.image = bookData.image;
+
+    const response = await axiosInstance.patch(`/books/${bookId}`, payload);
     return response.data;
   },
 
@@ -38,18 +56,31 @@ const bookApi = {
     return response.data;
   },
 
-  // Publish book (Author/Admin only)
-  publishBook: async (bookId) => {
-    const response = await axiosInstance.post(`/books/${bookId}/publish`);
-    return response.data;
+  // Upload image to Cloudinary
+  uploadImageToCloudinary: async (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', 'readian_books'); // Configure in Cloudinary
+
+    const response = await fetch(
+      'https://api.cloudinary.com/v1_1/dnkeca5yk/image/upload', // Replace with your cloud name
+      {
+        method: 'POST',
+        body: formData,
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error('Failed to upload image');
+    }
+
+    const data = await response.json();
+    return data.secure_url;
   },
 
-  // Upload book cover
-  uploadBookCover: async (bookId, file) => {
-    const formData = createFormData({ coverImage: file });
-    const response = await axiosInstance.post(`/books/${bookId}`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
+  // Publish book (change status to published)
+  publishBook: async (bookId) => {
+    const response = await axiosInstance.patch(`/books/${bookId}`, { status: 'published' });
     return response.data;
   },
 
@@ -70,7 +101,6 @@ const bookApi = {
     const response = await axiosInstance.get(`/books/${bookId}/chapters`, { params });
     console.log('📖 getBookChapters raw response:', response.data);
 
-    // Handle response structure
     let chapters = [];
     if (response.data.data?.chapters) {
       chapters = response.data.data.chapters;
@@ -80,10 +110,10 @@ const bookApi = {
       chapters = response.data.chapters;
     }
 
-    // Ensure chapters have proper structure
-    chapters = chapters.map(chapter => ({
+    chapters = chapters.map((chapter, index) => ({
       ...chapter,
-      id: chapter._id || chapter.id
+      id: chapter._id || chapter.id,
+      chapterNumber: chapter.chapterNumber || index + 1
     }));
 
     const result = {
@@ -106,7 +136,6 @@ const bookApi = {
 
   // Search books with advanced filters
   searchBooks: async (filters = {}) => {
-    // Backend expects: title, author, genre, tags, page, limit
     const response = await axiosInstance.get('/books/search', { params: filters });
     return response.data;
   },
@@ -147,26 +176,6 @@ const bookApi = {
   rateBook: async (bookId, rating) => {
     const response = await axiosInstance.post(`/books/${bookId}/rate`, { rating });
     return response.data;
-  },
-
-  // Get user's rating for a book
-  getMyRating: async (bookId) => {
-    const response = await axiosInstance.get(`/books/${bookId}/rating/me`);
-    return response.data;
-  },
-
-  // Delete user's rating
-  deleteRating: async (bookId) => {
-    const response = await axiosInstance.delete(`/books/${bookId}/rate`);
-    return response.data;
-  },
-
-  // Download a book as PDF (premium feature)
-  downloadBook: async (bookId) => {
-    const response = await axiosInstance.post(`/books/${bookId}/download`, {}, {
-      responseType: 'blob' // Important for file downloads
-    });
-    return response;
   },
 };
 

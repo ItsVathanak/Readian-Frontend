@@ -1,12 +1,9 @@
-import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
-import { Menu, X } from 'lucide-react'
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Menu, X } from 'lucide-react';
 
-const BookEditSidebar = ({stats, onDelete, isNewBook, onPublishWork, dashboardPath}) => {
-    const [isOpen, setIsOpen] = useState(false);
-
-    const isDraft = stats.pubStatus === 'draft' || isNewBook;
-    const publishText = isDraft ? 'Publish Work' : 'Unpublish Work';
+const BookEditSidebar = ({ onPublish, onDelete, isPublished, isNew }) => {
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
     <>
@@ -51,56 +48,66 @@ const BookEditSidebar = ({stats, onDelete, isNewBook, onPublishWork, dashboardPa
         </button>
 
         <h1 className='geist text-[24px] lg:text-[32px] font-semibold self-center text-center'>
-            Viewing Work
+          {isNew ? 'Create Book' : 'Edit Book'}
         </h1>
 
         <div className='self-stretch'>
-            <h2 className='geist text-[24px] font-semibold'>
-                Stats
-            </h2>
-            <p className='text-[20px]'>
-                Views: {stats.views || 0}
-            </p>
-            <p className='text-[20px]'>
-                Likes: {stats.likes || 0}
-            </p>
+          <h2 className='geist text-[24px] font-semibold mb-2'>
+            Status
+          </h2>
+          <div className='bg-white p-3 rounded-lg'>
+            {isPublished ? (
+              <div className='flex items-center gap-2'>
+                <span className='text-2xl'>✅</span>
+                <span className='text-lg font-semibold text-green-600'>Published</span>
+              </div>
+            ) : (
+              <div className='flex items-center gap-2'>
+                <span className='text-2xl'>📝</span>
+                <span className='text-lg font-semibold text-orange-600'>Draft</span>
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* Back to dash */}
-        <Link 
-            to={dashboardPath}
-            className='self-center text-center font-semibold bg-white w-full py-2 rounded-[15px] shadow-md hover:bg-black hover:text-white transition-all duration-300'
+        {/* Back to dashboard */}
+        <Link
+          to='/authordash/works'
+          className='self-center text-center font-semibold bg-white w-full py-2 rounded-[15px] shadow-md hover:bg-black hover:text-white transition-all duration-300'
+          onClick={() => setIsOpen(false)}
         >
-            Back to dashboard
+          Back to Dashboard
         </Link>
 
-        {/* publish */}
-
-        {stats.pubStatus === "draft" ? (
-            <button
-                onClick={onPublishWork}
-                className='self-center font-semibold bg-white w-full py-2 rounded-[15px] shadow-md hover:bg-black hover:text-white transition-all duration-300'
-            >
-                {publishText}
-            </button>
-        ) : (
-            <></>
-        ) }
-        
-
-        {/* delete work */}
-        {!isNewBook && (
-            <button 
-            onClick={onDelete}
-            className='self-center font-semibold text-[#FF0000] bg-[#FFD7DF] w-full py-2 rounded-[15px] shadow-md hover:bg-[#FF0000] hover:text-white transition-all duration-300'
-        >
-            Delete Work
-        </button>
+        {/* Publish button - only show if draft */}
+        {onPublish && !isPublished && (
+          <button
+            onClick={() => {
+              onPublish();
+              setIsOpen(false);
+            }}
+            className='self-center font-semibold bg-[#00A819] text-white w-full py-2 rounded-[15px] shadow-md hover:bg-[#1A5632] transition-all duration-300'
+          >
+            📢 Publish Book
+          </button>
         )}
-        
+
+        {/* Delete button - only show for existing books */}
+        {onDelete && !isNew && (
+          <button
+            onClick={() => {
+              onDelete();
+              setIsOpen(false);
+            }}
+            className='self-center font-semibold text-[#FF0000] bg-[#FFD7DF] w-full py-2 rounded-[15px] shadow-md hover:bg-[#FF0000] hover:text-white transition-all duration-300'
+          >
+            🗑️ Delete Book
+          </button>
+        )}
       </aside>
     </>
-  )
-}
+  );
+};
 
-export default BookEditSidebar
+export default BookEditSidebar;
+

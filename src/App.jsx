@@ -114,11 +114,11 @@ function App() {
             <ProfilePage />
           </ProtectedRoute>
         } />
-        <Route path="/settings" element={
-          <ProtectedRoute>
-            <SettingsPage />
-          </ProtectedRoute>
-        } />
+{/*         <Route path="/settings" element={ */}
+{/*           <ProtectedRoute> */}
+{/*             <SettingsPage /> */}
+{/*           </ProtectedRoute> */}
+{/*         } /> */}
         <Route path="/downloads" element={
           <ProtectedRoute>
             <DownloadHistoryPage />
@@ -141,7 +141,7 @@ function App() {
           </ProtectedRoute>
         }/>
         <Route path="/become-author" element={<BecomeAuthorPage />}/>
-        <Route path="/confirm-payment" element={<ConfirmPaymentPage />}/>
+{/*         <Route path="/confirm-payment" element={<ConfirmPaymentPage />}/> */}
 
         {/* 404 Catch-all route */}
         <Route path="*" element={<NotFoundPage />} />
