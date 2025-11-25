@@ -9,20 +9,14 @@ const BookEditForm = ({
   genre, setGenre,
   premiumStatus, setPremiumStatus,
   contentType, setContentType,
-  coverImage, setCoverImage,
-  existingCoverUrl,
+  coverImageUrl,
+  onImageUpload,
+  uploadingImage,
   onSave,
-  uploading
+  saving
 }) => {
   const [tagInput, setTagInput] = useState('');
   const [genreInput, setGenreInput] = useState('');
-  const [coverPreview, setCoverPreview] = useState(existingCoverUrl || null);
-
-  useEffect(() => {
-    if (existingCoverUrl) {
-      setCoverPreview(existingCoverUrl);
-    }
-  }, [existingCoverUrl]);
 
   useEffect(() => {
     if (premiumStatus === undefined) {
@@ -54,26 +48,6 @@ const BookEditForm = ({
     setGenre(genre.filter(g => g !== genreToRemove));
   };
 
-  const handleCoverUpload = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/heic'];
-    if (!allowedTypes.includes(file.type.toLowerCase())) {
-      alert('Please upload a valid image file (JPEG, PNG, HEIC or WebP)');
-      return;
-    }
-
-    const maxSize = 5 * 1024 * 1024;
-    if (file.size > maxSize) {
-      alert('Image size must be less than 5MB');
-      return;
-    }
-
-    setCoverImage(file);
-    setCoverPreview(URL.createObjectURL(file));
-  };
-
   const handleKeyPress = (e, handler) => {
     if (e.key === 'Enter') {
       e.preventDefault();
@@ -83,33 +57,47 @@ const BookEditForm = ({
 
   return (
     <div className="flex flex-col lg:flex-row gap-6 lg:gap-[50px] w-full max-w-[910px] px-4 lg:px-0">
-      {/* Cover Image */}
+      {/* Cover Image - Same pattern as profile image */}
       <div className="w-full lg:w-[220px]">
-        <div className="w-full h-[330px] bg-gray-300 rounded-[15px] flex items-center justify-center text-black mb-[20px] overflow-hidden">
-          {coverPreview ? (
+        <div className="relative w-full h-[330px] bg-gray-300 rounded-[15px] flex items-center justify-center overflow-hidden mb-[20px]">
+          {coverImageUrl ? (
             <img
-              src={coverPreview}
+              src={coverImageUrl}
               alt="Book Cover"
               className="w-full h-full object-cover"
             />
           ) : (
-            <span className="text-gray-600">No Cover Image</span>
+            <div className="flex flex-col items-center justify-center text-gray-500">
+              <svg className="w-16 h-16 mb-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
+              </svg>
+              <span className="text-sm text-center">No Cover Image</span>
+            </div>
+          )}
+          {uploadingImage && (
+            <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+              <div className="animate-spin rounded-full h-10 w-10 border-4 border-white border-t-transparent"></div>
+            </div>
           )}
         </div>
+
         <input
           type="file"
           accept="image/jpeg,image/png,image/webp,image/heic"
-          onChange={handleCoverUpload}
-          disabled={uploading}
+          onChange={onImageUpload}
+          disabled={uploadingImage}
           className="hidden"
           id="cover-upload"
         />
         <label
           htmlFor="cover-upload"
-          className={`w-full p-2 bg-black text-[#FFD7DF] rounded-[10px] cursor-pointer block text-center hover:bg-gray-800 transition-all ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}
+          className={`w-full p-2 bg-black text-[#FFD7DF] rounded-[10px] cursor-pointer block text-center hover:bg-gray-800 transition-all ${uploadingImage ? 'opacity-50 cursor-not-allowed' : ''}`}
         >
-          {uploading ? 'Uploading...' : 'Upload Image'}
+          {uploadingImage ? 'Uploading...' : 'Upload Cover'}
         </label>
+        <p className="text-xs text-gray-500 mt-2 text-center">
+          JPEG, PNG, WebP or HEIC (Max 5MB)
+        </p>
       </div>
 
       {/* Story Details Form */}
@@ -279,10 +267,10 @@ const BookEditForm = ({
 
         <button
           type="submit"
-          disabled={uploading}
+          disabled={saving || uploadingImage}
           className="w-full bg-[#1A5632] text-[#FFD7DF] p-3 rounded-lg font-bold hover:bg-[#FFD7DF] hover:text-[#1A5632] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {uploading ? 'Saving...' : 'Save Book'}
+          {saving ? 'Saving...' : 'Save Book'}
         </button>
       </form>
     </div>

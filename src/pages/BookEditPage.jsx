@@ -15,15 +15,16 @@ const BookEditPage = () => {
 
   const [bookToEdit, setBookToEdit] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [uploading, setUploading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   // Form state
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [status, setStatus] = useState('draft'); // draft by default
+  const [status, setStatus] = useState('draft');
   const [tags, setTags] = useState([]);
   const [genre, setGenre] = useState([]);
-  const [premiumStatus, setPremiumStatus] = useState(false); // false by default
+  const [premiumStatus, setPremiumStatus] = useState(false);
   const [contentType, setContentType] = useState('kids');
   const [bookStatus, setBookStatus] = useState('ongoing');
   const [chapters, setChapters] = useState([]);
@@ -78,21 +79,74 @@ const BookEditPage = () => {
     return <Navigate to="/authordash" replace />;
   }
 
+  // Handle image upload - EXACT same pattern as profile
+  const handleImageUpload = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) {
+      console.log('❌ No file selected');
+      return;
+    }
+
+    console.log('📸 File selected:', file.name, file.type, file.size);
+
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/heic'];
+    const fileType = file.type.toLowerCase();
+    if (!allowedTypes.includes(fileType)) {
+      console.log('❌ Invalid file type:', fileType);
+      handleApiError({ message: 'Please upload a valid image file (JPEG, PNG, HEIC or WebP)' });
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    const maxSize = 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+      console.log('❌ File too large:', file.size);
+      handleApiError({ message: 'Image size must be less than 5MB' });
+      return;
+    }
+
+    console.log('✅ File validation passed');
+
+    // If editing existing book, upload immediately (same as profile)
+    if (!isNew && bookId) {
+      try {
+        console.log('📤 Uploading to existing book:', bookId);
+        setUploadingImage(true);
+
+        const response = await bookApi.updateBookCover(bookId, file);
+        console.log('✅ Upload response:', response);
+
+        if (response.data && response.data.image) {
+          setCoverImageUrl(response.data.image);
+          showSuccessToast('Cover image updated successfully!');
+          console.log('✅ Image URL updated:', response.data.image);
+        } else {
+          console.log('⚠️ No image URL in response:', response);
+        }
+      } catch (error) {
+        console.error('❌ Upload error:', error);
+        handleApiError(error);
+      } finally {
+        setUploadingImage(false);
+      }
+    } else {
+      // For new books, store the file to upload after creation
+      console.log('💾 Storing file for new book');
+      setCoverImage(file);
+      const previewUrl = URL.createObjectURL(file);
+      setCoverImageUrl(previewUrl);
+      console.log('✅ Preview URL created:', previewUrl);
+      showSuccessToast('Image selected. It will be uploaded when you save the book.');
+    }
+  };
+
   // Save book
   const handleSave = async (e) => {
     e.preventDefault();
 
     try {
-      setUploading(true);
-
-      let imageUrl = coverImageUrl;
-
-      // Upload cover image if provided
-      if (coverImage) {
-        showSuccessToast('Uploading cover image...');
-        imageUrl = await bookApi.uploadImageToCloudinary(coverImage);
-        setCoverImageUrl(imageUrl);
-      }
+      setSaving(true);
 
       const bookData = {
         title,
@@ -101,29 +155,49 @@ const BookEditPage = () => {
         genre: Array.isArray(genre) ? genre.join(', ') : genre,
         isPremium: premiumStatus,
         status,
-        image: imageUrl,
         contentType,
         bookStatus,
-        chapters: isNew ? chapters : undefined // Only send chapters for new books
+        chapters: isNew ? chapters : undefined
       };
 
       if (isNew) {
+        console.log('📚 Creating new book...');
         const response = await bookApi.createBook(bookData);
-        showSuccessToast('Book created successfully!');
         const newBookId = response.data._id || response.data.id || response.data.data?._id;
+        console.log('✅ Book created with ID:', newBookId);
+
+        // Upload cover image if provided
+        if (coverImage && newBookId) {
+          try {
+            console.log('📤 Uploading cover image to new book...');
+            setUploadingImage(true);
+            const imageResponse = await bookApi.updateBookCover(newBookId, coverImage);
+            console.log('✅ Cover uploaded:', imageResponse);
+          } catch (error) {
+            console.error('❌ Error uploading cover:', error);
+            handleApiError(error);
+          } finally {
+            setUploadingImage(false);
+          }
+        }
+
+        showSuccessToast('Book created successfully!');
         navigate(`/edit/${newBookId}`, { replace: true });
       } else {
+        console.log('📝 Updating existing book...');
         await bookApi.updateBook(bookId, bookData);
         showSuccessToast('Book updated successfully!');
+
         // Refresh book data
         const updatedResponse = await bookApi.getBookById(bookId);
         setBookToEdit(updatedResponse.data);
         setCoverImage(null);
       }
     } catch (error) {
+      console.error('❌ Save error:', error);
       handleApiError(error);
     } finally {
-      setUploading(false);
+      setSaving(false);
     }
   };
 
@@ -224,11 +298,11 @@ const BookEditPage = () => {
             setPremiumStatus={setPremiumStatus}
             contentType={contentType}
             setContentType={setContentType}
-            coverImage={coverImage}
-            setCoverImage={setCoverImage}
-            existingCoverUrl={coverImageUrl}
+            coverImageUrl={coverImageUrl}
+            onImageUpload={handleImageUpload}
+            uploadingImage={uploadingImage}
             onSave={handleSave}
-            uploading={uploading}
+            saving={saving}
           />
 
           {/* Chapter Management for NEW books */}

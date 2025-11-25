@@ -15,6 +15,7 @@ const bookApi = {
 
   // Create a new book (Author only)
   createBook: async (bookData) => {
+    // Send as JSON for creating book with chapters
     const payload = {
       title: bookData.title,
       description: bookData.description || '',
@@ -50,32 +51,20 @@ const bookApi = {
     return response.data;
   },
 
+  // Upload book cover image - Exact same pattern as profile image
+  updateBookCover: async (bookId, file) => {
+    const formData = new FormData();
+    formData.append('image', file); // Field name: 'image'
+    const response = await axiosInstance.post(`/books/${bookId}`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data;
+  },
+
   // Delete book (Author only)
   deleteBook: async (bookId) => {
     const response = await axiosInstance.delete(`/books/${bookId}`);
     return response.data;
-  },
-
-  // Upload image to Cloudinary
-  uploadImageToCloudinary: async (file) => {
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('upload_preset', 'readian_books'); // Configure in Cloudinary
-
-    const response = await fetch(
-      'https://api.cloudinary.com/v1_1/dnkeca5yk/image/upload', // Replace with your cloud name
-      {
-        method: 'POST',
-        body: formData,
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error('Failed to upload image');
-    }
-
-    const data = await response.json();
-    return data.secure_url;
   },
 
   // Publish book (change status to published)
