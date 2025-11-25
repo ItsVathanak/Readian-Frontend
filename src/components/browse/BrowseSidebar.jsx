@@ -238,7 +238,7 @@ const BrowseSidebar = ({title,setTitle,author,setAuthor,status,setStatus,tags,se
             type="range"
             min={0}
             max={100}
-            step={5}
+            step={1}
             value={minLikes}
             onChange={(e) => setMinLikes(Number(e.target.value))}
             className='w-full appearance-none h-[2px] bg-black/40 rounded slider-thumb'

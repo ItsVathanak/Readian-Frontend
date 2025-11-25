@@ -124,12 +124,16 @@ const BookEditForm = ({title, setTitle, description, setDescription, status, set
             <label className="block font-semibold mb-1">Status</label>
             <div className="mb-4">
                 <label className="mr-4">
-                <input type="radio" value="Ongoing" checked={status === 'Ongoing'} onChange={(e) => setStatus(e.target.value)} className="mr-1" />
+                <input type="radio" value="ongoing" checked={status === 'ongoing'} onChange={(e) => setStatus(e.target.value)} className="mr-1" />
                     Ongoing
                 </label>
+                <label className="mr-4">
+                <input type="radio" value="finished" checked={status === 'finished'} onChange={(e) => setStatus(e.target.value)} className="mr-1" />
+                    Finished
+                </label>
                 <label>
-                <input type="radio" value="Completed" checked={status === 'Completed'} onChange={(e) => setStatus(e.target.value)} className="mr-1" />
-                    Completed
+                <input type="radio" value="hiatus" checked={status === 'hiatus'} onChange={(e) => setStatus(e.target.value)} className="mr-1" />
+                    Hiatus
                 </label>
             </div>
 

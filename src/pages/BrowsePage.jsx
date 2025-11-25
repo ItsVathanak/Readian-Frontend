@@ -29,9 +29,6 @@ const BrowsePage = () => {
     const [minLikes, setMinLikes] = useState(0);
     const [isPremium, setIsPremium] = useState('all'); // 'all', 'premium', 'free'
 
-    // Debounce timer ref
-    const debounceTimerRef = useRef(null);
-
     // Update title when search query changes from URL
     useEffect(() => {
         const newSearchQuery = searchParams.get('search') || '';
@@ -48,46 +45,6 @@ const BrowsePage = () => {
         }
     }, [searchParams]);
 
-    // Debounced filter handlers
-    const handleTitleChange = (value) => {
-        setTitle(value);
-        if (debounceTimerRef.current) {
-            clearTimeout(debounceTimerRef.current);
-        }
-        debounceTimerRef.current = setTimeout(() => {
-            // Debounced value will trigger fetchBooks via useEffect
-        }, 800);
-    };
-
-    const handleAuthorChange = (value) => {
-        setAuthor(value);
-        if (debounceTimerRef.current) {
-            clearTimeout(debounceTimerRef.current);
-        }
-        debounceTimerRef.current = setTimeout(() => {
-            // Debounced value will trigger fetchBooks via useEffect
-        }, 800);
-    };
-
-    const handleGenreChange = (value) => {
-        setGenre(value);
-        if (debounceTimerRef.current) {
-            clearTimeout(debounceTimerRef.current);
-        }
-        debounceTimerRef.current = setTimeout(() => {
-            // Debounced value will trigger fetchBooks via useEffect
-        }, 800);
-    };
-
-    const handleTagsChange = (value) => {
-        setTags(value);
-        if (debounceTimerRef.current) {
-            clearTimeout(debounceTimerRef.current);
-        }
-        debounceTimerRef.current = setTimeout(() => {
-            // Debounced value will trigger fetchBooks via useEffect
-        }, 800);
-    };
 
     // Observer for infinite scroll
     const observerTarget = useRef(null);
@@ -208,19 +165,20 @@ const BrowsePage = () => {
             <div className='flex flex-col lg:flex-row relative'>
                 <BrowseSidebar
                     title={title}
-                    setTitle={handleTitleChange}
+                    setTitle={setTitle}
                     author={author}
-                    setAuthor={handleAuthorChange}
+                    setAuthor={setAuthor}
                     status={status}
                     setStatus={setStatus}
                     tags={tags}
-                    setTags={handleTagsChange}
+                    setTags={setTags}
                     genre={genre}
-                    setGenre={handleGenreChange}
+                    setGenre={setGenre}
                     minLikes={minLikes}
                     setMinLikes={setMinLikes}
                     isPremium={isPremium}
                     setIsPremium={setIsPremium}
+                    onSearch={() => fetchBooks(1, false)}
                 />
                 <div className="flex-1">
                     <BrowseBookGrid filteredBooks={filteredBooks}/>
