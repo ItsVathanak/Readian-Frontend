@@ -26,7 +26,7 @@ const AllWorksCard = ({ book, onRemove }) => {
     : (typeof bookTags === 'string' ? bookTags : "No tags provided");
 
   return (
-    <div className='group relative flex rounded-[10px] border-solid border-2 w-[650px] h-[250px] bg-white overflow-hidden transition-all duration-300'>
+    <div className='group relative flex flex-col sm:flex-row rounded-[10px] border-solid border-2 w-full max-w-[650px] h-auto min-h-[250px] bg-white overflow-hidden transition-all duration-300'>
 
       {/* --- Hover Overlay --- */}
       <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center gap-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
@@ -47,11 +47,11 @@ const AllWorksCard = ({ book, onRemove }) => {
       {/* --- Original Card Content --- */}
       {/* Image */}
       {coverImage ? (
-        <div className='bg-[#CEF17B] w-4/12 h-full rounded-l-[10px]'>
+        <div className='bg-[#CEF17B] w-full sm:w-5/12 md:w-4/12 h-[200px] sm:h-full rounded-t-[10px] sm:rounded-l-[10px] sm:rounded-tr-none flex-shrink-0'>
           <img src={coverImage} alt={title || "Book Cover"} className='w-full h-full object-cover' />
         </div>
       ) : (
-        <div className='bg-[#CEF17B] w-4/12 h-full rounded-l-[10px] flex items-center justify-center'>
+        <div className='bg-[#CEF17B] w-full sm:w-5/12 md:w-4/12 h-[200px] sm:h-full rounded-t-[10px] sm:rounded-l-[10px] sm:rounded-tr-none flex items-center justify-center flex-shrink-0'>
           <h1 className='text-center'>No Preview</h1>
         </div>
       )}
@@ -83,7 +83,7 @@ const AllWorksCard = ({ book, onRemove }) => {
         {/* Middle section */}
         <div>
           <p className='font-bold text-[16px] capitalize'>{bookStatus}</p>
-          <p className='text-[12px] w-[440px] wrap-break-word' title={description || "No description provided"}>
+          <p className='text-[12px] w-full max-w-[440px] break-words' title={description || "No description provided"}>
             {truncate(description, 100) || "No description provided"}
           </p>
         </div>

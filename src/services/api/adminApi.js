@@ -11,7 +11,8 @@ const adminApi = {
     // Transform _id to id for component compatibility
     const users = rawUsers.map(user => ({
       ...user,
-      id: user._id || user.id
+      id: user._id || user.id,
+      publishedBooksCount: user.publishedBooksCount || user.totalBooks || user.booksCount || 0
     }));
     const result = {
       ...response.data,

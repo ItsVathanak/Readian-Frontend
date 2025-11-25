@@ -55,7 +55,7 @@ function AuthorAnalytics() {
       <h1 className="geist text-4xl md:text-5xl font-bold text-[#00A819]">Your Analytics</h1>
 
       {/* Statistics Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Books */}
         <div className="bg-white p-6 rounded-lg shadow-md border-2 border-green-700">
           <h3 className="text-sm font-semibold text-gray-600 mb-2">Total Books</h3>

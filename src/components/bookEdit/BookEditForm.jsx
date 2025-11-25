@@ -54,6 +54,12 @@ const BookEditForm = ({title, setTitle, description, setDescription, status, set
         setCoverPreview(URL.createObjectURL(file));
     };
 
+    React.useEffect(() => {
+        if (premiumStatus === undefined) {
+            setPremiumStatus(false);
+        }
+    }, [premiumStatus, setPremiumStatus]);
+
     return (
         <div className="flex flex-col lg:flex-row gap-6 lg:gap-[50px] w-full max-w-[910px] px-4 lg:px-0">
 

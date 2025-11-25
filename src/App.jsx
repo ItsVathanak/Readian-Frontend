@@ -106,6 +106,7 @@ function App() {
           <Route path="works" element={<MyWorks />} />
           <Route path="drafts" element={<MyDrafts />} />
           <Route path="liked" element={<MyLiked />}/>
+          <Route path="analytics" element={<AuthorAnalytics />}/>
         </Route>
 
         <Route path="/profile" element={
