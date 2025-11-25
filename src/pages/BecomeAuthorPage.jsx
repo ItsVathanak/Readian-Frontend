@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Pen, BookOpen, TrendingUp, Award, Users, Sparkles } from 'lucide-react';
+import SettingsSidebar from '../components/common/SettingsSidebar';
 import { userApi } from '../services/api';
 import { handleApiError, showSuccessToast } from '../services/utils/errorHandler';
 import { useAuth } from '../services/auth/authContext';
@@ -13,22 +14,25 @@ const BecomeAuthorPage = () => {
   // Check if already an author
   if (user?.role === 'AUTHOR' || user?.role === 'ADMIN') {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#C0FFB3] via-white to-[#FFFDEE] py-12 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="bg-white rounded-2xl shadow-xl p-12">
-            <Award className="w-20 h-20 mx-auto text-green-600 mb-6" />
-            <h1 className="text-4xl font-bold text-gray-800 mb-4">
-              You're Already an Author! 🎉
-            </h1>
-            <p className="text-xl text-gray-600 mb-8">
-              Start creating amazing stories for your readers.
-            </p>
-            <button
-              onClick={() => navigate('/authordash')}
-              className="px-8 py-4 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold text-lg"
-            >
-              Go to Author Dashboard
-            </button>
+      <div className="flex min-h-screen bg-[#FFFDEE]">
+        <SettingsSidebar />
+        <div className="flex-1 bg-gradient-to-b from-[#C0FFB3] via-white to-[#FFFDEE] py-12 px-4">
+          <div className="max-w-4xl mx-auto text-center">
+            <div className="bg-white rounded-2xl shadow-xl p-12">
+              <Award className="w-20 h-20 mx-auto text-green-600 mb-6" />
+              <h1 className="text-4xl font-bold text-gray-800 mb-4">
+                You're Already an Author! 🎉
+              </h1>
+              <p className="text-xl text-gray-600 mb-8">
+                Start creating amazing stories for your readers.
+              </p>
+              <button
+                onClick={() => navigate('/authordash')}
+                className="px-8 py-4 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold text-lg"
+              >
+                Go to Author Dashboard
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -96,10 +100,12 @@ const BecomeAuthorPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#C0FFB3] via-white to-[#FFFDEE] py-12 px-4">
-      <div className="max-w-6xl mx-auto">
-        {/* Hero Section */}
-        <div className="text-center mb-16">
+    <div className="flex min-h-screen bg-[#FFFDEE]">
+      <SettingsSidebar />
+      <div className="flex-1 bg-gradient-to-b from-[#C0FFB3] via-white to-[#FFFDEE] py-12 px-4 overflow-x-hidden">
+        <div className="max-w-6xl mx-auto">
+          {/* Hero Section */}
+          <div className="text-center mb-16">
           <h1 className="text-5xl md:text-6xl font-bold text-gray-800 mb-6">
             Join Our Creator Community
           </h1>
@@ -240,6 +246,7 @@ const BecomeAuthorPage = () => {
           >
             {loading ? 'Processing...' : user ? 'Become an Author Now' : 'Sign In to Get Started'}
           </button>
+        </div>
         </div>
       </div>
     </div>

@@ -3,11 +3,13 @@ import { User, BookOpen, Award } from 'lucide-react';
 
 const AuthorCard = ({ author, bookCount = 0 }) => {
   // Handle both populated author object and just ID
+  console.log('AuthorCard author prop:', author);
   const authorData = {
     _id: author?._id || author,
     name: author?.name || 'Unknown Author',
     avatar: author?.avatar || null,
     bio: author?.bio || null,
+    email: author?.email || null,
   };
 
   return (
@@ -35,6 +37,17 @@ const AuthorCard = ({ author, bookCount = 0 }) => {
           <h4 className="text-2xl font-bold text-gray-800 mb-2">
             {authorData.name}
           </h4>
+          {authorData.email && (
+            <p className="text-gray-600 mb-4 leading-relaxed">
+              {authorData.email}
+            </p>
+          )}
+
+          {!authorData.email && (
+            <p className="text-gray-500 italic mb-4">
+              No email available
+            </p>
+          )}
 
           {authorData.bio && (
             <p className="text-gray-600 mb-4 leading-relaxed">

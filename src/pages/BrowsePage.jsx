@@ -27,6 +27,7 @@ const BrowsePage = () => {
     const [tags, setTags] = useState(initialTag);
     const [genre, setGenre] = useState('');
     const [minLikes, setMinLikes] = useState(0);
+    const [isPremium, setIsPremium] = useState('all'); // 'all', 'premium', 'free'
 
     // Debounce timer ref
     const debounceTimerRef = useRef(null);
@@ -168,7 +169,7 @@ const BrowsePage = () => {
         };
     }, [hasMore, loading, loadingMore, currentPage, fetchBooks]);
 
-    // Apply frontend-only filters (min likes and status)
+    // Apply frontend-only filters (min likes, status, and premium)
     const filteredBooks = allBooks.filter(book => {
         // Status filter (bookStatus from backend: ongoing, finished, hiatus)
         if (status !== 'All' && book.bookStatus !== status) {
@@ -177,6 +178,14 @@ const BrowsePage = () => {
 
         // Min likes filter (frontend only since backend doesn't support this)
         if (minLikes > 0 && (book.likes || 0) < minLikes) {
+            return false;
+        }
+
+        // Premium filter (frontend only)
+        if (isPremium === 'premium' && !book.isPremium) {
+            return false;
+        }
+        if (isPremium === 'free' && book.isPremium) {
             return false;
         }
 
@@ -210,6 +219,8 @@ const BrowsePage = () => {
                     setGenre={handleGenreChange}
                     minLikes={minLikes}
                     setMinLikes={setMinLikes}
+                    isPremium={isPremium}
+                    setIsPremium={setIsPremium}
                 />
                 <div className="flex-1">
                     <BrowseBookGrid filteredBooks={filteredBooks}/>

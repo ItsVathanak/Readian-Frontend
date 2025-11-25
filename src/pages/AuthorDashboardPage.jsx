@@ -7,11 +7,11 @@ function AuthorDashboardPage() {
   const { user } = useAuth();
 
   return (
-    <div className="flex justify-between bg-[#FFFDEE]">
+    <div className="flex min-h-screen bg-[#FFFDEE]">
       <AuthDashSidebar currentUser={user} />
 
       {/* Main Content */}
-      <main className="p-6 w-full flex-1">
+      <main className="p-6 lg:p-8 xl:p-10 w-full flex-1 overflow-x-hidden">
         <Outlet context={{ user }} />
       </main>
     </div>

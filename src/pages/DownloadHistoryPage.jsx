@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import SettingsSidebar from '../components/common/SettingsSidebar';
 import { downloadApi } from '../services/api';
 import { handleApiError, showSuccessToast } from '../services/utils/errorHandler';
-import { Link } from 'react-router-dom';
 
 function DownloadHistoryPage() {
   const [downloads, setDownloads] = useState([]);
@@ -69,16 +70,18 @@ function DownloadHistoryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FFFDEE] py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#1A5632] mb-2">
-            Download History
-          </h1>
-          <p className="text-gray-600 text-sm sm:text-base">
-            View and re-download your previously downloaded books
-          </p>
+    <div className="flex min-h-screen bg-[#FFFDEE]">
+      <SettingsSidebar />
+      <div className="flex-1 bg-[#FFFDEE] py-8 px-4 sm:px-6 lg:px-8 overflow-x-hidden">
+        <div className="max-w-7xl mx-auto">
+          {/* Header */}
+          <div className="mb-8">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#1A5632] mb-2">
+              Download History
+            </h1>
+            <p className="text-gray-600 text-sm sm:text-base">
+              View and re-download your previously downloaded books
+            </p>
         </div>
 
         {/* Downloads List */}
@@ -174,6 +177,7 @@ function DownloadHistoryPage() {
             </p>
           </div>
         )}
+        </div>
       </div>
     </div>
   );

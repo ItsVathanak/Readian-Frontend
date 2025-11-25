@@ -147,19 +147,19 @@ const BookDetail = ({book,signedIn,currentUser}) => {
           General Info
         </h1>
         {/* top right rectangles */}
-        <div 
-          className='absolute bg-white w-[120px] sm:w-[150px] h-[90px] sm:h-[115px] rounded-tl-[30px] sm:rounded-tl-[50px] z-10 top-0 left-[180px] sm:left-[230px]'
-        />
-        <div 
-          className='absolute bg-[#1A5632] w-[40px] sm:w-[50px] h-[40px] sm:h-[50px] z-0 top-0 left-[180px] sm:left-[230px]'
-        />
+{/*         <div */}
+{/*           className='absolute bg-white w-[120px] sm:w-[150px] h-[90px] sm:h-[115px] rounded-tl-[30px] sm:rounded-tl-[50px] z-10 top-0 left-[180px] sm:left-[230px]' */}
+{/*         /> */}
+{/*         <div */}
+{/*           className='absolute bg-[#1A5632] w-[40px] sm:w-[50px] h-[40px] sm:h-[50px] z-0 top-0 left-[180px] sm:left-[230px]' */}
+{/*         /> */}
         {/* bottom left rectangles */}
-        <div
-          className='absolute bg-white w-[120px] sm:w-[150px] h-[90px] sm:h-[115px] rounded-tl-[30px] sm:rounded-tl-[50px] z-10 top-[90px] sm:top-[115px] left-0'
-        />
-        <div 
-          className='absolute bg-[#1A5632] w-[40px] sm:w-[50px] h-[40px] sm:h-[50px] z-0 top-[90px] sm:top-[115px] left-0'
-        />
+{/*         <div */}
+{/*           className='absolute bg-white w-[120px] sm:w-[150px] h-[90px] sm:h-[115px] rounded-tl-[30px] sm:rounded-tl-[50px] z-10 top-[90px] sm:top-[115px] left-0' */}
+{/*         /> */}
+{/*         <div  */}
+{/*           className='absolute bg-[#1A5632] w-[40px] sm:w-[50px] h-[40px] sm:h-[50px] z-0 top-[90px] sm:top-[115px] left-0' */}
+{/*         /> */}
       </div>
 
       <div className='flex flex-col lg:flex-row'>
@@ -298,7 +298,7 @@ const BookDetail = ({book,signedIn,currentUser}) => {
           )}
 
           {/* Action Buttons */}
-          <div className='flex flex-wrap gap-3 mt-8'>
+          <div className='flex flex-wrap gap-3 my-8'>
             <Link
               to={`/book/${book._id}/chapter/1`}
               className='flex-1 min-w-[200px] text-center py-3 px-6 bg-[#1A5632] text-white text-sm sm:text-base font-semibold rounded-lg hover:bg-[#FFD7DF] hover:text-[#1A5632] transition-all duration-300 shadow-md'
@@ -354,24 +354,24 @@ const BookDetail = ({book,signedIn,currentUser}) => {
 
         {/* Additional Info */}
         <div className='mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
-          <div className='p-4 bg-white rounded-lg'>
-            <p className='text-xs text-gray-600 mb-1'>Status</p>
-            <p className='font-semibold text-[#1A5632] capitalize'>
-              {book.bookStatus || 'N/A'}
-            </p>
-          </div>
-          <div className='p-4 bg-white rounded-lg'>
-            <p className='text-xs text-gray-600 mb-1'>Content Type</p>
-            <p className='font-semibold text-[#1A5632] capitalize'>
-              {book.contentType || 'N/A'}
-            </p>
-          </div>
-          <div className='p-4 bg-white rounded-lg'>
-            <p className='text-xs text-gray-600 mb-1'>Download Allowed</p>
-            <p className='font-semibold text-[#1A5632]'>
-              {book.allowDownload ? '✅ Yes' : '❌ No'}
-            </p>
-          </div>
+{/*           <div className='p-4 bg-white rounded-lg'> */}
+{/*             <p className='text-xs text-gray-600 mb-1'>Status</p> */}
+{/*             <p className='font-semibold text-[#1A5632] capitalize'> */}
+{/*               {book.bookStatus || 'N/A'} */}
+{/*             </p> */}
+{/*           </div> */}
+{/*           <div className='p-4 bg-white rounded-lg'> */}
+{/*             <p className='text-xs text-gray-600 mb-1'>Content Type</p> */}
+{/*             <p className='font-semibold text-[#1A5632] capitalize'> */}
+{/*               {book.contentType || 'N/A'} */}
+{/*             </p> */}
+{/*           </div> */}
+{/*           <div className='p-4 bg-white rounded-lg'> */}
+{/*             <p className='text-xs text-gray-600 mb-1'>Download Allowed</p> */}
+{/*             <p className='font-semibold text-[#1A5632]'> */}
+{/*               {book.allowDownload ? '✅ Yes' : '❌ No'} */}
+{/*             </p> */}
+{/*           </div> */}
         </div>
 
         {/* Creation/Update Info */}

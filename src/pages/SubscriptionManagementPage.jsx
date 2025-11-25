@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import SettingsSidebar from '../components/common/SettingsSidebar';
 import { useAuth } from '../services/auth/authContext';
 import { subscriptionApi } from '../services/api';
 import { handleApiError, showSuccessToast } from '../services/utils/errorHandler';
@@ -90,10 +91,12 @@ const SubscriptionManagementPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#C0FFB3] via-white to-[#FFFDEE] py-12 px-4">
-      <div className="max-w-6xl mx-auto">
-        {/* Current Subscription Status */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
+    <div className="flex min-h-screen bg-[#FFFDEE]">
+      <SettingsSidebar />
+      <div className="flex-1 bg-gradient-to-b from-[#C0FFB3] via-white to-[#FFFDEE] py-12 px-4 overflow-x-hidden">
+        <div className="max-w-6xl mx-auto">
+          {/* Current Subscription Status */}
+          <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
           <h1 className="text-3xl font-bold text-gray-800 mb-6">
             Subscription Management
           </h1>
@@ -220,6 +223,7 @@ const SubscriptionManagementPage = () => {
               )}
             </div>
           ))}
+        </div>
         </div>
       </div>
     </div>

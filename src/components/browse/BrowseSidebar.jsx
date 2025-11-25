@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-const BrowseSidebar = ({title,setTitle,author,setAuthor,status,setStatus,tags,setTags,genre,setGenre,minLikes,setMinLikes}) => {
+const BrowseSidebar = ({title,setTitle,author,setAuthor,status,setStatus,tags,setTags,genre,setGenre,minLikes,setMinLikes,isPremium,setIsPremium}) => {
   const [isOpen, setIsOpen] = useState(false);
 
 
@@ -60,14 +60,14 @@ const BrowseSidebar = ({title,setTitle,author,setAuthor,status,setStatus,tags,se
         </h2>
 
         {/* Title */}
-        <div>
+        <div className='w-full'>
             <label>Title:</label><br />
             <input 
                 type="text"
                 placeholder='Search Title'
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className='bg-white rounded-[10px] p-2'
+                className='bg-white rounded-[10px] p-2 w-full'
             />
         </div>
 
@@ -135,21 +135,6 @@ const BrowseSidebar = ({title,setTitle,author,setAuthor,status,setStatus,tags,se
                 <p>Ongoing</p>
             </label>
 
-            <label className='cursor-pointer flex items-center gap-2'>
-                <div className='size-[15px]'>
-                    <input
-                    type="radio"
-                    value="hiatus"
-                    checked={status === 'hiatus'}
-                    onChange={(e) => setStatus(e.target.value)}
-                    className='opacity-0 peer absolute'
-                    />
-                    <svg className=" size-full pointer-events-none" fill="none" viewBox="0 0 15 15">
-                        <circle cx="7.5" cy="7.5" fill={status === "hiatus" ? "black" : "white"} r="6.5" stroke="black" strokeWidth="2" />
-                    </svg>
-                </div>
-                <p>Hiatus</p>
-            </label>
 
             {/* <div>
                 <svg className="block size-full pointer-events-none" fill="none" preserveAspectRatio="none" viewBox="0 0 15 15">
@@ -190,6 +175,59 @@ const BrowseSidebar = ({title,setTitle,author,setAuthor,status,setStatus,tags,se
             <small className='text-gray-500 text-xs block mt-1'>Separate tags with commas</small>
         </div>
 
+        {/* Premium Filter */}
+        <div className='flex flex-col gap-1 self-start'>
+            <label>Premium:</label>
+
+            <label className='cursor-pointer flex items-center gap-2'>
+                <div className='size-[15px]'>
+                    <input
+                    type="radio"
+                    value="all"
+                    checked={isPremium === 'all'}
+                    onChange={(e) => setIsPremium(e.target.value)}
+                    className='opacity-0 peer absolute'
+                    />
+                    <svg className="size-full pointer-events-none" fill="none" viewBox="0 0 15 15">
+                        <circle cx="7.5" cy="7.5" fill={isPremium === "all" ? "black" : "white"} r="6.5" stroke="black" strokeWidth="2" />
+                    </svg>
+                </div>
+                <p>All</p>
+            </label>
+
+            <label className='cursor-pointer flex items-center gap-2'>
+                <div className='size-[15px]'>
+                    <input
+                    type="radio"
+                    value="premium"
+                    checked={isPremium === 'premium'}
+                    onChange={(e) => setIsPremium(e.target.value)}
+                    className='opacity-0 peer absolute'
+                    />
+                    <svg className="size-full pointer-events-none" fill="none" viewBox="0 0 15 15">
+                        <circle cx="7.5" cy="7.5" fill={isPremium === "premium" ? "black" : "white"} r="6.5" stroke="black" strokeWidth="2" />
+                    </svg>
+                </div>
+                <p>Premium Only</p>
+            </label>
+
+            <label className='cursor-pointer flex items-center gap-2'>
+                <div className='size-[15px]'>
+                    <input
+                    type="radio"
+                    value="free"
+                    checked={isPremium === 'free'}
+                    onChange={(e) => setIsPremium(e.target.value)}
+                    className='opacity-0 peer absolute'
+                    />
+                    <svg className="size-full pointer-events-none" fill="none" viewBox="0 0 15 15">
+                        <circle cx="7.5" cy="7.5" fill={isPremium === "free" ? "black" : "white"} r="6.5" stroke="black" strokeWidth="2" />
+                    </svg>
+                </div>
+                <p>Free Only</p>
+            </label>
+        </div>
+
         {/* Likes */}
         <div className='w-full'>
             <label>
@@ -199,8 +237,8 @@ const BrowseSidebar = ({title,setTitle,author,setAuthor,status,setStatus,tags,se
             <input 
             type="range"
             min={0}
-            max={3}
-            step={1}
+            max={100}
+            step={5}
             value={minLikes}
             onChange={(e) => setMinLikes(Number(e.target.value))}
             className='w-full appearance-none h-[2px] bg-black/40 rounded slider-thumb'
