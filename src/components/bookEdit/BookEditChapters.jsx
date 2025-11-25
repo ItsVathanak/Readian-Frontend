@@ -151,16 +151,22 @@ const BookEditChapters = ({ bookId }) => {
       const newChapters = arrayMove(chapters, oldIndex, newIndex);
       setChapters(newChapters);
 
-      // Create chapter order array
-      const chapterOrder = newChapters.map((chapter, index) => chapter.chapterNumber || index + 1);
+      // Create chapter order ARRAY: [2, 1, 3, 5, 4]
+      // This represents the new chapter order by chapter number
+      const chapterOrder = newChapters.map((chapter, index) =>
+        chapter.chapterNumber || (index + 1)
+      );
+
+      console.log('📋 Reordering chapters (array format):', chapterOrder);
 
       try {
         await chapterApi.reorderChapters(bookId, chapterOrder);
         showSuccessToast('Chapters reordered successfully!');
-        fetchChapters(); // Refresh to get updated order from server
+        fetchChapters();
       } catch (error) {
+        console.error('❌ Reorder error:', error);
         handleApiError(error);
-        fetchChapters(); // Revert on error
+        fetchChapters();
       }
     }
   };

@@ -1,21 +1,17 @@
 import axiosInstance from './axiosConfig';
 
 const bookApi = {
-  // Get all books with filters
   getAllBooks: async (params = {}) => {
     const response = await axiosInstance.get('/books', { params });
     return response.data;
   },
 
-  // Get book by ID
   getBookById: async (bookId) => {
     const response = await axiosInstance.get(`/books/${bookId}`);
     return response.data;
   },
 
-  // Create a new book (Author only)
   createBook: async (bookData) => {
-    // Send as JSON for creating book with chapters
     const payload = {
       title: bookData.title,
       description: bookData.description || '',
@@ -33,7 +29,6 @@ const bookApi = {
     return response.data;
   },
 
-  // Update book (Author only) - Using PATCH
   updateBook: async (bookId, bookData) => {
     const payload = {};
 
@@ -51,44 +46,37 @@ const bookApi = {
     return response.data;
   },
 
-  // Upload book cover image - Exact same pattern as profile image
-  updateBookCover: async (bookId, file) => {
-    const formData = new FormData();
-    formData.append('image', file); // Field name: 'image'
-    const response = await axiosInstance.post(`/books/${bookId}`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+  updateBookImage: async (bookId, imageUrl) => {
+    console.log('🖼️ Updating book image URL:', imageUrl);
+    const response = await axiosInstance.patch(`/books/${bookId}`, {
+      image: imageUrl
     });
+    console.log('✅ Image update response:', response.data);
     return response.data;
   },
 
-  // Delete book (Author only)
   deleteBook: async (bookId) => {
     const response = await axiosInstance.delete(`/books/${bookId}`);
     return response.data;
   },
 
-  // Publish book (change status to published)
   publishBook: async (bookId) => {
     const response = await axiosInstance.patch(`/books/${bookId}`, { status: 'published' });
     return response.data;
   },
 
-  // Like a book
   likeBook: async (bookId) => {
     const response = await axiosInstance.post(`/books/${bookId}/like`);
     return response.data;
   },
 
-  // Unlike a book
   unlikeBook: async (bookId) => {
     const response = await axiosInstance.post(`/books/${bookId}/unlike`);
     return response.data;
   },
 
-  // Get book chapters
   getBookChapters: async (bookId, params = {}) => {
     const response = await axiosInstance.get(`/books/${bookId}/chapters`, { params });
-    console.log('📖 getBookChapters raw response:', response.data);
 
     let chapters = [];
     if (response.data.data?.chapters) {
@@ -105,31 +93,25 @@ const bookApi = {
       chapterNumber: chapter.chapterNumber || index + 1
     }));
 
-    const result = {
+    return {
       ...response.data,
       data: {
         chapters,
         pagination: response.data.pagination || response.data.data?.pagination || {}
       }
     };
-
-    console.log('✅ getBookChapters transformed result:', result);
-    return result;
   },
 
-  // Get specific chapter by number
   getChapterByNumber: async (bookId, chapterNumber) => {
     const response = await axiosInstance.get(`/books/${bookId}/chapters/${chapterNumber}`);
     return response.data;
   },
 
-  // Search books with advanced filters
   searchBooks: async (filters = {}) => {
     const response = await axiosInstance.get('/books/search', { params: filters });
     return response.data;
   },
 
-  // Get books by genre
   getBooksByGenre: async (genre, params = {}) => {
     const response = await axiosInstance.get('/books', {
       params: { genre, ...params },
@@ -137,7 +119,6 @@ const bookApi = {
     return response.data;
   },
 
-  // Get books by author
   getBooksByAuthor: async (authorId, params = {}) => {
     const response = await axiosInstance.get('/books', {
       params: { authorId, ...params },
@@ -145,7 +126,6 @@ const bookApi = {
     return response.data;
   },
 
-  // Get trending books
   getTrendingBooks: async (params = {}) => {
     const response = await axiosInstance.get('/books', {
       params: { sort: 'trending', ...params },
@@ -153,7 +133,6 @@ const bookApi = {
     return response.data;
   },
 
-  // Get popular books
   getPopularBooks: async (params = {}) => {
     const response = await axiosInstance.get('/books', {
       params: { sort: 'popular', ...params },
@@ -161,7 +140,6 @@ const bookApi = {
     return response.data;
   },
 
-  // Rate a book (1-5 stars)
   rateBook: async (bookId, rating) => {
     const response = await axiosInstance.post(`/books/${bookId}/rate`, { rating });
     return response.data;

@@ -41,11 +41,21 @@ const chapterApi = {
     return response.data;
   },
 
-  // Reorder chapters (Author only)
+  // Reorder chapters - Send ARRAY format [2, 1, 3]
   reorderChapters: async (bookId, chapterOrder) => {
-    const response = await axiosInstance.patch(`/books/${bookId}/chapters/reorder`, {
-      chapterOrder: chapterOrder
+    console.log('🚀 Sending chapter reorder:', {
+      url: `/books/${bookId}/chapters/reorder`,
+      method: 'PATCH',
+      chapterOrder: chapterOrder,
+      isArray: Array.isArray(chapterOrder),
+      format: 'array [2, 1, 3]'
     });
+
+    const response = await axiosInstance.patch(`/books/${bookId}/chapters/reorder`, {
+      chapterOrder: chapterOrder // Send as array
+    });
+
+    console.log('✅ Backend response:', response.data);
     return response.data;
   },
 };
