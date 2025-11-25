@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { userApi } from '../../services/api';
+import { userApi, analyticsApi } from '../../services/api';
 import { handleApiError } from '../../services/utils/errorHandler';
 import { Link } from 'react-router-dom';
 
 function AuthorAnalytics() {
   const [analytics, setAnalytics] = useState(null);
+  const [downloadStats, setDownloadStats] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -16,6 +17,14 @@ function AuthorAnalytics() {
       setLoading(true);
       const response = await userApi.getAuthorStats();
       setAnalytics(response.data);
+
+      // Fetch download stats
+      try {
+        const downloadResponse = await analyticsApi.getAuthorDownloads();
+        setDownloadStats(downloadResponse.data);
+      } catch (err) {
+        console.log('Download stats not available:', err);
+      }
     } catch (error) {
       handleApiError(error);
     } finally {
@@ -74,6 +83,17 @@ function AuthorAnalytics() {
             <div>From all books</div>
           </div>
         </div>
+
+        {/* Total Downloads */}
+        {downloadStats && (
+          <div className="bg-white p-6 rounded-lg shadow-md border-2 border-orange-700">
+            <h3 className="text-sm font-semibold text-gray-600 mb-2">Total Downloads</h3>
+            <p className="text-4xl font-bold text-orange-700">{downloadStats.totalDownloads || 0}</p>
+            <div className="mt-2 text-xs text-gray-500">
+              <div>Books downloaded: {downloadStats.booksWithDownloads || 0}</div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Top Books */}

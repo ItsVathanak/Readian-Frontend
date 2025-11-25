@@ -86,6 +86,18 @@ function Overview() {
             <div>Free: {analytics.freeUsers}</div>
           </div>
         </div>
+
+        {/* Total Downloads */}
+        {analytics.totalDownloads !== undefined && (
+          <div className="bg-white p-6 rounded-lg shadow-md border-2 border-pink-700">
+            <h3 className="text-sm font-semibold text-gray-600 mb-2">Total Downloads</h3>
+            <p className="text-4xl font-bold text-pink-700">{analytics.totalDownloads.toLocaleString()}</p>
+            <div className="mt-2 text-xs text-gray-500">
+              <div>This Month: {analytics.downloadsThisMonth || 0}</div>
+              <div>Books with downloads: {analytics.booksWithDownloads || 0}</div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Top Books */}

@@ -1,9 +1,10 @@
 import React from 'react'
 import { useState } from 'react';
 
-const BookEditForm = ({title, setTitle, description, setDescription, status, setStatus, tags, setTags, premiumStatus, setPremiumStatus, coverImage, setCoverImage, existingCoverUrl, onSave}) => {
+const BookEditForm = ({title, setTitle, description, setDescription, status, setStatus, tags, setTags, genre, setGenre, premiumStatus, setPremiumStatus, coverImage, setCoverImage, existingCoverUrl, onSave}) => {
 
     const [tagInput, setTagInput] = useState('');
+    const [genreInput, setGenreInput] = useState('');
     const [coverPreview, setCoverPreview] = useState(existingCoverUrl || null);
     const [uploadingCover, setUploadingCover] = useState(false);
 
@@ -15,8 +16,20 @@ const BookEditForm = ({title, setTitle, description, setDescription, status, set
         setTagInput('');
     };
   
-     const handleDeleteTag = (tagToRemove) => {
+    const handleDeleteTag = (tagToRemove) => {
         setTags(tags.filter(tag => tag !== tagToRemove));
+    };
+
+    const handleAddGenre = () => {
+        const newGenre = genreInput.trim();
+        if (newGenre && !genre.includes(newGenre)) {
+            setGenre([...genre, newGenre]);
+        }
+        setGenreInput('');
+    };
+
+    const handleDeleteGenre = (genreToRemove) => {
+        setGenre(genre.filter(g => g !== genreToRemove));
     };
 
     const handleCoverUpload = (e) => {
@@ -120,6 +133,29 @@ const BookEditForm = ({title, setTitle, description, setDescription, status, set
             ))}
             </div>
 
+            {/* Genre */}
+            <label className="geist block font-semibold mb-1">Genre</label>
+            <div className="flex gap-2 mb-2">
+                <input
+                    type="text"
+                    value={genreInput}
+                    onChange={(e) => setGenreInput(e.target.value)}
+                    className="w-full p-2 border rounded-[10px] bg-white"
+                    placeholder="Add a genre"
+                />
+                <button type="button" onClick={handleAddGenre} className="bg-gray-700 text-[#FFD7DF] px-4 rounded-[10px]">
+                    Add
+                </button>
+            </div>
+            <div className="flex flex-wrap gap-2 mb-4">
+            {genre.map((g) => (
+                <span key={g} className="bg-white px-2 py-1 rounded-full text-sm border-2 border-white hover:border-black">
+                    {g}
+                    <button type="button" onClick={() => handleDeleteGenre(g)} className="ml-1 font-bold">X</button>
+                </span>
+            ))}
+            </div>
+
             {/* Status */}
             <label className="block font-semibold mb-1">Status</label>
             <div className="mb-4">
@@ -130,10 +166,6 @@ const BookEditForm = ({title, setTitle, description, setDescription, status, set
                 <label className="mr-4">
                 <input type="radio" value="finished" checked={status === 'finished'} onChange={(e) => setStatus(e.target.value)} className="mr-1" />
                     Finished
-                </label>
-                <label>
-                <input type="radio" value="hiatus" checked={status === 'hiatus'} onChange={(e) => setStatus(e.target.value)} className="mr-1" />
-                    Hiatus
                 </label>
             </div>
 

@@ -219,7 +219,7 @@ const BookEditPage = () => {
     return (
         <div className='flex flex-col lg:flex-row bg-[#FFFDEE] min-h-screen'>
             {/* sidebar */}
-            <BookEditSidebar 
+            <BookEditSidebar
                 stats={{
                     views: isNew ? 0 : (bookToEdit?.viewCount || bookToEdit?.views || 0),
                     likes: isNew ? 0 : (bookToEdit?.likes || bookToEdit?.likesCount || 0),
@@ -255,7 +255,7 @@ const BookEditPage = () => {
                     onSave={handleSaveSubmit}
                 />
 
-                <BookEditChapters 
+                <BookEditChapters
                     chapters={chapters}
                     onEditChapter={handleEditChapterClick}
                     onNewChapter={handleNewChapter}

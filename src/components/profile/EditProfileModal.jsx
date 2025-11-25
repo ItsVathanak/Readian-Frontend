@@ -51,7 +51,7 @@ function EditProfileModal({ currentUser, onClose, onSave }) {
   return (
     // Overlay for the modal
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 w-full">
-      <div className="bg-white px-8 py-4 rounded-lg shadow-xl w-[600px] relative">
+      <div className="bg-white px-8 py-4 rounded-lg shadow-xl w-[600px] relative max-h-[90vh] overflow-y-auto">
         <h2 className="text-3xl font-bold mb-6 text-center">Edit My Account</h2>
         
         {/* Close Button */}

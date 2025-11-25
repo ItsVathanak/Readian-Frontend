@@ -12,6 +12,12 @@ const analyticsApi = {
     const response = await axiosInstance.get('/admin/analytics');
     return response.data;
   },
+
+  // Get author download analytics (Author only - their book download statistics)
+  getAuthorDownloads: async () => {
+    const response = await axiosInstance.get('/author/downloads/analytics');
+    return response.data;
+  },
 };
 
 export default analyticsApi;

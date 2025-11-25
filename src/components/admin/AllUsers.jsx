@@ -104,37 +104,47 @@ function AllUsers() {
         />
       </div>
 
-      {/* User Table */}
-      <div className="bg-white p-6 rounded-lg shadow-md border-2 border-green-700">
-        <table className="w-full text-left table-auto">
+      {/* User Table - Responsive with horizontal scroll */}
+      <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md border-2 border-green-700 overflow-x-auto">
+        <table className="w-full text-left table-auto min-w-[800px]">
           <thead>
             <tr className="border-b-2 border-gray-300">
-              <th className="p-2">User ID</th>
-              <th className="p-2">Username</th>
-              <th className="p-2">Email</th>
-              <th className="p-2">Join Date</th>
-              <th className="p-2">Subscription</th>
-              <th className="p-2">Works</th>
-              <th className="p-2 text-center">Action</th>
+              <th className="p-2 text-sm">User ID</th>
+              <th className="p-2 text-sm">Username</th>
+              <th className="p-2 text-sm">Email</th>
+              <th className="p-2 text-sm">Join Date</th>
+              <th className="p-2 text-sm">Subscription</th>
+              <th className="p-2 text-sm">Plan</th>
+              <th className="p-2 text-sm">Works</th>
+              <th className="p-2 text-center text-sm">Action</th>
             </tr>
           </thead>
           <tbody>
             {displayUsers.map((user) => (
               <tr key={user.id} className="border-b border-gray-200 hover:bg-gray-50">
-                <td className="p-2">{user.id?.toString().slice(0, 8)}...</td>
-                <td className="p-2">{user.name}</td>
-                <td className="p-2">{user.email}</td>
-                <td className="p-2">
+                <td className="p-2 text-xs sm:text-sm">{user.id?.toString().slice(0, 8)}...</td>
+                <td className="p-2 text-sm font-medium">{user.name}</td>
+                <td className="p-2 text-xs sm:text-sm">{user.email}</td>
+                <td className="p-2 text-xs sm:text-sm">
                   {new Date(user.createdAt).toLocaleDateString()}
                 </td>
                 <td className="p-2">
                   {user.subscriptionStatus === 'active' ? (
-                    <span className="font-semibold text-green-600 capitalize">Active</span>
+                    <span className="text-xs sm:text-sm font-semibold text-green-600 capitalize">Active</span>
                   ) : (
-                    <span className="text-gray-500">Inactive</span>
+                    <span className="text-xs sm:text-sm text-gray-500">Inactive</span>
                   )}
                 </td>
-                <td className="p-2">{user.booksCount || 0}</td>
+                <td className="p-2">
+                  {user.subscriptionPlan ? (
+                    <span className="text-xs sm:text-sm font-semibold text-blue-600 capitalize">
+                      {user.subscriptionPlan}
+                    </span>
+                  ) : (
+                    <span className="text-xs sm:text-sm text-gray-400">Free</span>
+                  )}
+                </td>
+                <td className="p-2 text-sm font-semibold">{user.publishedBooksCount || 0}</td>
                 <td className="p-2 text-center">
                   <div className="flex gap-2 justify-center">
                     <button
