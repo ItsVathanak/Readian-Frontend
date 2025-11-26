@@ -104,7 +104,7 @@ const BookDetailPage = () => {
 
         {/* Author Card */}
         <AuthorCard
-          author={book.author}
+          author={user}
           bookCount={book.authorBookCount}
         />
 
