@@ -20,6 +20,7 @@ const BookDetailPage = () => {
         setLoading(true);
         const response = await bookApi.getBookById(id);
         setBook(response.data);
+        console.log('Fetched book:', response.data);
       } catch (err) {
         setError(err.response?.data?.message || 'Failed to load book');
         handleApiError(err);
@@ -104,7 +105,7 @@ const BookDetailPage = () => {
 
         {/* Author Card */}
         <AuthorCard
-          author={user}
+          author={book.author}
           bookCount={book.authorBookCount}
         />
 
