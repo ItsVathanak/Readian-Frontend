@@ -29,7 +29,7 @@ const BrowseSidebar = ({title,setTitle,author,setAuthor,status,setStatus,tags,se
         onClick={(e) => e.stopPropagation()}
         className={`
         fixed lg:sticky
-        top-0 lg:top-24
+        top-0 lg:top-10
         left-0 lg:left-0
         h-screen lg:h-fit
         w-[280px] sm:w-[320px] lg:w-[280px] xl:w-[320px]

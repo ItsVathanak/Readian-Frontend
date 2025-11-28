@@ -84,7 +84,7 @@ const SubscriptionManagementPage = () => {
 
   if (loading && !subscriptionInfo) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#C0FFB3] via-white to-[#FFFDEE] flex items-center justify-center">
+      <div className="min-h-screen bg-[#FFFDEE] flex items-center justify-center">
         <div className="text-2xl">Loading subscription details...</div>
       </div>
     );
@@ -93,7 +93,7 @@ const SubscriptionManagementPage = () => {
   return (
     <div className="flex min-h-screen bg-[#FFFDEE]">
       <SettingsSidebar />
-      <div className="flex-1 bg-gradient-to-b from-[#C0FFB3] via-white to-[#FFFDEE] py-12 px-4 overflow-x-hidden">
+      <div className="flex-1 bg-[#FFFDEE] py-12 px-4 overflow-x-hidden">
         <div className="max-w-6xl mx-auto">
           {/* Current Subscription Status */}
           <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">

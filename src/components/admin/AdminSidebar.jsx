@@ -82,7 +82,7 @@ function AdminSidebar({ currentUser }) {
         </div>
 
         {/* Navigation */}
-        <nav className="mt-[30px] md:mt-[40px] lg:mt-[50px] flex flex-col gap-4 w-full px-2">
+        <nav className="mt-[30px] md:mt-[40px] lg:mt-[50px] flex flex-col gap-4 w-full">
 
           {/* My Content Section */}
           <h3 className="text-[24px] md:text-[26px] lg:text-[28px] text-center font-semibold text-[#1A5632] uppercase mt-4">

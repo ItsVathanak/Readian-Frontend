@@ -65,7 +65,7 @@ function ReadChapterPage() {
   // Render the chapter content with subscription guard only
   return (
     <SubscriptionGuard book={book}>
-      <div className='bg-gradient-to-b from-[#C0FFB3] via-white to-[#FFFDEE] min-h-screen'>
+      <div className='bg-[#1A5632] min-h-screen'>
         {/* Chapter Navigation Bar */}
         <ChapterNavigation
           bookId={bookId}

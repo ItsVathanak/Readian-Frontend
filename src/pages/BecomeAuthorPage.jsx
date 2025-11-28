@@ -16,7 +16,7 @@ const BecomeAuthorPage = () => {
     return (
       <div className="flex min-h-screen bg-[#FFFDEE]">
         <SettingsSidebar />
-        <div className="flex-1 bg-gradient-to-b from-[#C0FFB3] via-white to-[#FFFDEE] py-12 px-4">
+        <div className="flex-1 bg-[#FFFDEE] py-12 px-4">
           <div className="max-w-4xl mx-auto text-center">
             <div className="bg-white rounded-2xl shadow-xl p-12">
               <Award className="w-20 h-20 mx-auto text-green-600 mb-6" />

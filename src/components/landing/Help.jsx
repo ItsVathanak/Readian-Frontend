@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 
 const Help = () => {
   return (
-    <div className='bg-[#FFFDEE] py-8 px-4 sm:py-12 sm:pr-8 md:pr-16 lg:pr-[100px]'>
+    <div className='bg-[#FFFDEE] py-8 sm:py-12 sm:pr-8 md:pr-16 lg:pr-[100px]'>
       <div className='flex flex-col justify-center items-center text-center bg-[#1A5632] rounded-r-[50px] md:rounded-r-[100px] min-h-[300px] py-8 px-4 sm:px-8 md:px-16 lg:pl-[100px] gap-6'>
         <h1 className='geist text-3xl sm:text-4xl md:text-[48px] text-white font-semibold'>Not sure what to do?</h1>
         <p className='text-lg sm:text-xl md:text-[32px] text-white max-w-4xl'>Visit our instructions page to find helpful tips, FAQs, and instructions on how to use the site.</p>

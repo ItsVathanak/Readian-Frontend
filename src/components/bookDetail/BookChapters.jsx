@@ -3,13 +3,27 @@ import SingleChapter from './SingleChapter'
 
 const BookChapters = ({chapterList,bookId}) => {
   return (
-    <div className='relative w-full max-w-[1200px] mx-4 md:mx-auto rounded-br-[50px] md:rounded-br-[100px] bg-[#FFD7DF] shadow-2xl'>
+    <div className='relative w-full max-w-[1200px] mx-4 md:mx-auto rounded-br-[50px] md:rounded-br-[100px] bg-[#FFD7DF]'>
         {/* corner section */}
-        <div className='absolute top-0 left-0 bg-[#1A5632] w-[200px] sm:w-[270px] h-[90px] sm:h-[115px] rounded-br-[30px] sm:rounded-br-[50px] flex justify-center items-center'>
+        <div className='absolute top-0 left-0 bg-[#1A5632] w-[200px] sm:w-[230px] h-[90px] sm:h-[115px] rounded-br-[30px] sm:rounded-br-[50px] flex justify-center items-center'>
             {/* text */}
-            <h1 className='bg-none border-2 border-solid border-[#FFD7DF] rounded-[20px] sm:rounded-[30px] h-[32px] sm:h-[40px] px-3 sm:px-5 text-[18px] sm:text-[24px] text-[#FFD7DF] font-bold whitespace-nowrap'>
-                Table of Contents
+            <h1 className='bg-none border-2 border-solid border-[#FFD7DF] rounded-[20px] sm:rounded-[30px] h-[32px] sm:h-[40px] px-3 sm:px-5 text-[18px] sm:text-[24px] text-[#FFD7DF] font-semibold whitespace-nowrap'>
+                Chapters
             </h1>
+            {/* top right rectangles */}
+            <div 
+                className='absolute bg-[#FFD7DF] w-[120px] sm:w-[150px] h-[90px] sm:h-[115px] rounded-tl-[30px] sm:rounded-tl-[50px] z-10 top-0 left-[200px] sm:left-[230px]'
+            />
+            <div 
+                className='absolute bg-[#1A5632] w-[40px] sm:w-[50px] h-[40px] sm:h-[50px] z-0 top-0 left-[200px] sm:left-[230px]'
+            />
+            {/* bottom left rectangles */}
+            <div
+                className='absolute bg-[#FFD7DF] w-[120px] sm:w-[150px] h-[90px] sm:h-[115px] rounded-tl-[30px] sm:rounded-tl-[50px] z-10 top-[90px] sm:top-[115px] left-0'
+            />
+            <div 
+                className='absolute bg-[#1A5632] w-[40px] sm:w-[50px] h-[40px] sm:h-[50px] z-0 top-[90px] sm:top-[115px] left-0'
+            />
         </div>
 
         {/* List of chapters */}

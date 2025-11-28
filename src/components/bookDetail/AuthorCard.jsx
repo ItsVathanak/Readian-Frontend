@@ -13,7 +13,7 @@ const AuthorCard = ({ author, bookCount = 0 }) => {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-4xl">
+    <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-[1200px]">
       <h3 className="text-xl font-bold text-gray-800 mb-4">About the Author</h3>
 
       <div className="flex flex-col sm:flex-row items-start gap-6">

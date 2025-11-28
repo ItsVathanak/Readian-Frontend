@@ -97,8 +97,8 @@ const BookDetailPage = () => {
   }
 
   return (
-    <div className='bg-gradient-to-b from-[#C0FFB3] via-white to-[#FFFDEE] min-h-screen py-8 px-4'>
-      <div className='flex flex-col gap-8 max-w-7xl mx-auto'>
+    <div className='bg-[#1A5632] min-h-screen py-8 px-4'>
+      <div className='flex flex-col gap-8 max-w-7xl mx-auto items-center'>
         {/* Book Detail - Includes all book info, stats, rating, and download */}
         <BookDetail book={book} signedIn={isAuthenticated} currentUser={user}/>
 

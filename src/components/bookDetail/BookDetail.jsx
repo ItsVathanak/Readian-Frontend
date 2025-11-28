@@ -139,32 +139,32 @@ const BookDetail = ({book,signedIn,currentUser}) => {
   };
 
   return (
-    <div className='relative w-full max-w-[1200px] mx-4 md:mx-auto bg-white rounded-tr-[50px] md:rounded-tr-[100px] rounded-bl-[50px] md:rounded-bl-[100px] overflow-hidden flex flex-col shadow-2xl'>
+    <div className='relative w-full max-w-[1200px] mx-4 md:mx-auto bg-white rounded-tr-[50px] md:rounded-tr-[100px] rounded-bl-[50px] md:rounded-bl-[100px] overflow-hidden flex flex-col'>
       {/* Corner Section */}
-      <div className='absolute top-0 left-0 bg-[#1A5632] w-[180px] sm:w-[230px] h-[90px] sm:h-[115px] rounded-br-[30px] sm:rounded-br-[50px] flex justify-center items-center'>
+      <div className='absolute top-0 left-0 bg-[#1A5632] w-[180px] sm:w-[230px] h-[90px] sm:h-[115px] rounded-br-[30px] sm:rounded-br-[50px] flex justify-center items-center z-10'>
         {/* text */}
-        <h1 className='bg-none border-2 border-solid border-[#FFD7DF] rounded-[20px] sm:rounded-[30px] h-[32px] sm:h-[40px] px-3 sm:px-5 text-[18px] sm:text-[24px] text-[#FFD7DF]'>
+        <h1 className='bg-none border-2 border-solid border-[#FFD7DF] rounded-[20px] sm:rounded-[30px] h-[32px] sm:h-[40px] px-3 sm:px-5 text-[18px] sm:text-[24px] font-semibold text-[#FFD7DF]'>
           General Info
         </h1>
         {/* top right rectangles */}
-{/*         <div */}
-{/*           className='absolute bg-white w-[120px] sm:w-[150px] h-[90px] sm:h-[115px] rounded-tl-[30px] sm:rounded-tl-[50px] z-10 top-0 left-[180px] sm:left-[230px]' */}
-{/*         /> */}
-{/*         <div */}
-{/*           className='absolute bg-[#1A5632] w-[40px] sm:w-[50px] h-[40px] sm:h-[50px] z-0 top-0 left-[180px] sm:left-[230px]' */}
-{/*         /> */}
+        <div
+         className='absolute bg-white w-[120px] sm:w-[150px] h-[90px] sm:h-[115px] rounded-tl-[30px] sm:rounded-tl-[50px] z-10 top-0 left-[180px] sm:left-[230px]'
+        />
+        <div 
+           className='absolute bg-[#1A5632] w-[40px] sm:w-[50px] h-[40px] sm:h-[50px] z-0 top-0 left-[180px] sm:left-[230px]'
+         />
         {/* bottom left rectangles */}
-{/*         <div */}
-{/*           className='absolute bg-white w-[120px] sm:w-[150px] h-[90px] sm:h-[115px] rounded-tl-[30px] sm:rounded-tl-[50px] z-10 top-[90px] sm:top-[115px] left-0' */}
-{/*         /> */}
-{/*         <div  */}
-{/*           className='absolute bg-[#1A5632] w-[40px] sm:w-[50px] h-[40px] sm:h-[50px] z-0 top-[90px] sm:top-[115px] left-0' */}
-{/*         /> */}
+        <div
+           className='absolute bg-white w-[120px] sm:w-[150px] h-[90px] sm:h-[115px] rounded-tl-[30px] sm:rounded-tl-[50px] z-10 top-[90px] sm:top-[115px] left-0'
+         />
+         <div 
+           className='absolute bg-[#1A5632] w-[40px] sm:w-[50px] h-[40px] sm:h-[50px] z-0 top-[90px] sm:top-[115px] left-0'
+         />
       </div>
 
       <div className='flex flex-col lg:flex-row'>
         {/* Left: Cover Image */}
-        <div className='w-full lg:w-[350px] h-[400px] sm:h-[450px] lg:h-[500px] flex-shrink-0 mt-[90px] sm:mt-[115px] lg:mt-0 lg:ml-8 lg:my-8'>
+        <div className='w-full self-center lg:w-[350px] h-[400px] sm:h-[450px] lg:h-[500px] flex-shrink-0 mt-[90px] sm:mt-[115px] lg:mt-[50px] lg:ml-8 lg:my-8 z-20'>
           <img
             src={book.image || '/placeholder-book.png'}
             alt={book.title || "Book cover"}

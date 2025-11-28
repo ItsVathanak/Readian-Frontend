@@ -70,7 +70,7 @@ function SettingsSidebar() {
           Settings
         </h1>
 
-        <nav className="flex flex-col gap-4 w-full px-2">
+        <nav className="flex flex-col gap-4 w-full">
           {menuItems.map((item) => (
             <NavLink
               key={item.to}
