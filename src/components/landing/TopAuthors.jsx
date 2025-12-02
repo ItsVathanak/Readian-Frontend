@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { analyticsApi } from '../../services/api';
 import { handleApiError } from '../../services/utils/errorHandler';
+import { Eye, Heart, Star } from 'lucide-react';
 
 const TopAuthors = () => {
   const [topAuthors, setTopAuthors] = useState([]);
@@ -75,16 +76,22 @@ const TopAuthors = () => {
 
             {/* Stats */}
             <div className='w-full flex flex-col gap-2 text-sm'>
-              <div className='flex justify-between'>
-                <span className='text-gray-700'>👁️ Views:</span>
+              <div className='flex justify-between items-center'>
+                <span className='text-gray-700 flex items-center gap-1'>
+                  <Eye size={14} /> Views:
+                </span>
                 <span className='font-semibold'>{author.totalViews.toLocaleString()}</span>
               </div>
-              <div className='flex justify-between'>
-                <span className='text-gray-700'>❤️ Likes:</span>
+              <div className='flex justify-between items-center'>
+                <span className='text-gray-700 flex items-center gap-1'>
+                  <Heart size={14} /> Likes:
+                </span>
                 <span className='font-semibold'>{author.totalLikes.toLocaleString()}</span>
               </div>
-              <div className='flex justify-between'>
-                <span className='text-gray-700'>⭐ Rating:</span>
+              <div className='flex justify-between items-center'>
+                <span className='text-gray-700 flex items-center gap-1'>
+                  <Star size={14} /> Rating:
+                </span>
                 <span className='font-semibold'>
                   {author.averageRating > 0 ? author.averageRating.toFixed(1) : 'N/A'}
                 </span>

@@ -19,9 +19,12 @@ const BecomeAuthorPage = () => {
         <div className="flex-1 bg-[#FFFDEE] py-12 px-4">
           <div className="max-w-4xl mx-auto text-center">
             <div className="bg-white rounded-2xl shadow-xl p-12">
-              <Award className="w-20 h-20 mx-auto text-green-600 mb-6" />
+              <div className="flex items-center justify-center gap-3 mb-6">
+                <Award className="w-20 h-20 text-green-600" />
+                <Sparkles className="w-12 h-12 text-yellow-500" />
+              </div>
               <h1 className="text-4xl font-bold text-gray-800 mb-4">
-                You're Already an Author! 🎉
+                You're Already an Author!
               </h1>
               <p className="text-xl text-gray-600 mb-8">
                 Start creating amazing stories for your readers.
@@ -47,7 +50,7 @@ const BecomeAuthorPage = () => {
       // Update user context
       updateUser({ role: 'AUTHOR' });
 
-      showSuccessToast('Welcome to the author community! 🎉');
+      showSuccessToast('Welcome to the author community!');
 
       // Redirect to author dashboard
       setTimeout(() => {

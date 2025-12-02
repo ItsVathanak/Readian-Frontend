@@ -5,6 +5,7 @@ import ChapterNavigation from '../components/readChapter/ChapterNavigation';
 import { bookApi } from '../services/api';
 import { handleApiError } from '../services/utils/errorHandler';
 import SubscriptionGuard from '../components/common/SubscriptionGuard';
+import AgeGuard from '../components/common/AgeGuard';
 
 function ReadChapterPage() {
   const { bookId, chapterNumber } = useParams();
@@ -62,31 +63,33 @@ function ReadChapterPage() {
     );
   }
 
-  // Render the chapter content with subscription guard only
+  // Render the chapter content with age guard and subscription guard
   return (
-    <SubscriptionGuard book={book}>
-      <div className='bg-[#1A5632] min-h-screen'>
-        {/* Chapter Navigation Bar */}
-        <ChapterNavigation
-          bookId={bookId}
-          currentChapter={chapter}
-          allChapters={allChapters}
-          prevChapter={prevChapter}
-          nextChapter={nextChapter}
-        />
-
-        {/* Main Content */}
-        <div className='max-w-4xl mx-auto px-4 py-8'>
-          <ChapterContent
-            chapter={chapter}
+    <AgeGuard contentType={book.contentType} bookTitle={book.title}>
+      <SubscriptionGuard book={book}>
+        <div className='bg-[#1A5632] min-h-screen'>
+          {/* Chapter Navigation Bar */}
+          <ChapterNavigation
             bookId={bookId}
-            book={book}
+            currentChapter={chapter}
+            allChapters={allChapters}
             prevChapter={prevChapter}
             nextChapter={nextChapter}
           />
+
+          {/* Main Content */}
+          <div className='max-w-4xl mx-auto px-4 py-8'>
+            <ChapterContent
+              chapter={chapter}
+              bookId={bookId}
+              book={book}
+              prevChapter={prevChapter}
+              nextChapter={nextChapter}
+            />
+          </div>
         </div>
-      </div>
-    </SubscriptionGuard>
+      </SubscriptionGuard>
+    </AgeGuard>
   );
 }
 
